@@ -95,7 +95,7 @@
 
 function createUpdateForm(url) {
     var form = $("<form>").attr("action", url).attr("method", "put").attr("class", "form-update");
-    form.append('<button type="submit" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-edit"></span></button>');
+    form.append('<button type="submit" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></button>');
     form.asyncForm(function(data, status) {
     }, function(data, status) {
         $.pnotify({
@@ -109,14 +109,14 @@ function createUpdateForm(url) {
 }
 
 function createUpdateButtonModal(onclick) {
-    var button = $("<button/>").attr("type", "button").attr("class", "btn btn-default btn-lg").html('<span class="glyphicon glyphicon-edit"></span>');
+    var button = $("<button/>").attr("type", "button").attr("class", "btn btn-default btn-xs").html('<span class="glyphicon glyphicon-edit"></span>');
     button.click(onclick);
     return button;
 }
 
 function createDeleteForm(url) {
     var form = $("<form>").attr("action", url).attr("method", "delete").attr("class", "form-delete");
-    form.append('<button type="submit" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-trash"></span></button>');
+    form.append('<button type="submit" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
     form.asyncForm(function(data, status) {
         $(this).closest("tr").deleteTableLine();
     }, function(data, status) {
