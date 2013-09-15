@@ -215,3 +215,21 @@ function createSelect(name, label, options, value, style, required) {
     div.append(selectComponent);
     return div;
 }
+
+function createCheckbox(name, value) {
+    var input = $("<input/>").attr("type", "checkbox").attr("name", name).attr("id", name);
+    if (value == true || value == "true") {
+        input.attr("checked", "checked");
+    }
+    return input;
+}
+
+function createFormCheckbox(name, label, value) {
+    var div = $("<div/>").attr("class", "form-group");
+    var labelComponent = $("<label/>").attr("class", "checkbox");
+    var inputComponent = createCheckbox(name, value)
+    labelComponent.append(inputComponent);
+    labelComponent.append(" " + label);
+    div.append(labelComponent);
+    return div;
+}

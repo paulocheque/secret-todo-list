@@ -59,6 +59,8 @@ class ApiHandler(tornado.web.RequestHandler):
             data[arg] = self.get_argument(arg)
             if data[arg] == '': # Tornado 3.0+ compatibility
                 data[arg] = None
+            if data[arg].lower() in ['false']:
+                data[arg] = False
         return data
 
     def raise403(self):
