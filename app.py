@@ -11,10 +11,7 @@ import db_connection # connect to databases
 from tornado_rest_handler import routes, rest_routes
 
 # apps
-from apps.home import Home
 from apps.accounts.handlers import *
-
-from apps.todolist.models import *
 from apps.todolist.handlers import *
 
 
