@@ -55,6 +55,8 @@
             newRow.append(col);
         }
         $(this).find("tbody:last").append(newRow);
+        var table = $(this);
+        table.trigger("update");
     };
 
     $.fn.refreshTableLine = function(success, error) {
@@ -79,11 +81,16 @@
             var col = $(this).find("td").eq(i);
             col.html(text);
         }
+        var table = $(this).closest("table");
+        table.trigger("update");
     };
 
     $.fn.deleteTableLine = function(lineId) {
         delete $.fn.tableData[lineId];
         $(this).remove();
+        var table = $(this).closest("table");
+        table.trigger("update");
+        table.trigger("updateAll");
     }
 
     $.fn.removeModal = function() {
