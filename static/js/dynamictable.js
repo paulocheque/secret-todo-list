@@ -210,14 +210,21 @@ function createModalWithForm(id, url, formContent, callbackSuccess, callbackErro
         $(this).data('bs.modal', null);
         modal.remove();
     });
+    modal.on('shown.bs.modal', function() {
+        modal.find('input:text')[0].focus();
+    });
     return modal;
 }
 
-function createInput(name, label, value, type, style, placeholder, autocomplete) {
+function createInput(name, label, value, type, properties) {
+    properties = properties || {placeholder:"", autocomplete:"off", autofocus:""};
     var div = $("<div/>").attr("class", "form-group");
     var labelComponent = $("<label/>").attr("for", name).html(label);
-    var inputComponent = $("<input/>").attr("type", type || "text").attr("name", name).attr("id", name).attr("value", value || "").attr("class", "form-control " + (style || "input-medium"));
-    inputComponent = inputComponent.attr("placeholder", placeholder || "").attr("autocomplete", autocomplete || "off").attr("autofocus", "");
+    var inputComponent = $("<input/>").attr("type", type || "text").attr("name", name).attr("id", name).attr("value", value || "");
+    inputComponent = inputComponent.attr("class", "form-control " + (properties["style"] || "input-medium"));
+    for (var key in properties) {
+        inputComponent = inputComponent.attr(key, properties[key]);
+    }
     div.append(labelComponent);
     div.append(inputComponent);
     return div;
