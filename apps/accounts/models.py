@@ -6,11 +6,20 @@ import sha
 from mongoengine import *
 
 
+SOCIAL_CHOICES = (('GH', 'GitHub'), ('F', 'Facebook'), ('G', 'Google'), ('T', 'Twitter'), ('FF', 'FriendFinder'), )
+
 class User(Document):
     email = EmailField(required=True)
     password = StringField(required=True)
     internal_password = StringField(required=False)
     registered_on = DateTimeField(required=True, default=datetime.utcnow())
+
+    social = StringField(required=False, choices=SOCIAL_CHOICES)
+    website_id = StringField(required=False)
+    username = StringField(required=False)
+    access_token = StringField(required=False)
+    gender = StringField(required=False)
+    locale = StringField(required=False)
 
     def validate_password(self):
         errors = {}
