@@ -70,7 +70,8 @@
             $("#" + modalId).removeModal();
             var line = $("#" + data._id);
             line.refreshTableLine(function(data, status) {
-                line.updateTableLine(data, [data.completed, data.description, data.due_date, data.priority]);
+                var completed = createCheckbox("completed", data.completed);
+                line.updateTableLine(data, [completed, data.description, data.due_date, data.priority]);
                 line.fadeOut().fadeIn();
             });
         };
