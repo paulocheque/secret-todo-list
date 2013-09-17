@@ -35,12 +35,12 @@
 <table id="table-list" class="table table-striped table-hover table-condensed table-responsive tablesorter" action="/api/tasks">
     <thead>
         <tr>
-            <th>Completed</th>
-            <th>Description</th>
-            <th>Due date</th>
-            <th>Priority</th>
-            <th>Edit</th>
-            <th>Delete</th>
+            <th class="col-lg-1">Priority</th>
+            <th class="col-lg-2">Due date</th>
+            <th class="col-lg-6">Description</th>
+            <th class="col-lg-1">Completed</th>
+            <th class="col-lg-1">Edit</th>
+            <th class="col-lg-1">Delete</th>
         </tr>
     </thead>
     <tbody>
@@ -71,7 +71,7 @@
             var line = $("#" + data._id);
             line.refreshTableLine(function(data, status) {
                 var completed = createCheckbox("completed", data.completed);
-                line.updateTableLine(data, [completed, data.description, data.due_date, data.priority]);
+                line.updateTableLine(data, [data.priority, data.due_date, data.description, completed]);
                 line.fadeOut().fadeIn();
             });
         };
@@ -95,7 +95,7 @@
             var value = $(this).is(":checked");
             client.tasks.update(data._id, {completed:value});
         });
-        $("#table-list").createTableLine(data, data._id, url, [completed, data.description, data.due_date, data.priority, updateButton, deleteForm]);
+        $("#table-list").createTableLine(data, data._id, url, [data.priority, data.due_date, data.description, completed, updateButton, deleteForm]);
     }
 
     $(document).ready(function() {
