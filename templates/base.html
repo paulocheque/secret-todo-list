@@ -47,7 +47,6 @@
         <div class="navbar-collapse collapse navbar-responsive-collapse">
           <ul class="nav navbar-nav">
           {% if not current_user or current_user == 'None' %}
-            <li><a href="/register">Register</a></li>
           {% else %}
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Tools <b class="caret"></b></a>
@@ -74,14 +73,6 @@
           </ul>
           {% end %}
           </ul>
-
-          {% if not current_user or current_user == 'None' %}
-            <form class="navbar-form pull-right" action="/login" method="POST">
-              <input class="col-md-2" type="text" placeholder="Email" name='email'>
-              <input class="col-md-2" type="password" placeholder="Password" name='password'>
-              <button type="submit" class="btn">Sign in</button>
-            </form>
-          {% end %}
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ from tornado_rest_handler import routes, rest_routes
 
 # apps
 from apps.accounts.handlers import *
+from apps.accounts.social import *
 from apps.todolist.handlers import *
 
 
@@ -24,6 +25,9 @@ logging.basicConfig(
 
 TORNADO_ROUTES = [
     (r'/?', Home),
+
+    (r'/auth/facebook', FacebookLoginHandler),
+    (r'/auth/google', GoogleLoginHandler),
 
     (r'/register', RegisterHandler),
     (r'/login', LoginHandler),

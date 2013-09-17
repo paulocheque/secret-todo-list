@@ -57,7 +57,7 @@ class User(Document):
 
     @classmethod
     def is_valid_password(cls, password):
-        if len(password) < 10 or len(password) > 512: return False
+        if len(password) < 6 or len(password) > 512: return False
         if re.match('.*\s+', password): return False
         if not re.match('.*[a-z]+', password): return False
         if not re.match('.*[A-Z]+', password): return False
