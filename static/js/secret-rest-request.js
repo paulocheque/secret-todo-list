@@ -56,12 +56,15 @@
         };
 
         this._request = function(method, url, data, success, error) {
-            var signature = this._getSignature(method, url, data);
-            var authenticatedData = this._getRequestData(data, signature);
             // console.debug(method);
             // console.debug(url);
+            var signature = this._getSignature(method, url, data);
+            var authenticatedData = this._getRequestData(data, signature);
             // console.debug("Data: " + data);
             // console.debug("Authenticated Data: " + authenticatedData);
+            if (method == "DELETE") { // DELETE does not send params
+                url = url + "?" + authenticatedData;
+            }
             $.ajax({
                 method: method,
                 url: url,

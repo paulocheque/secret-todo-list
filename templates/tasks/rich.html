@@ -109,7 +109,7 @@
         deleteForm.on('submit', function (e) {
             e.preventDefault();
             var success = function(response, status) {
-                $(this).closest("tr").deleteTableLine();
+                deleteForm.closest("tr").deleteTableLine();
             };
             client.del(data._id, success, defaultErrorHandler);
         });

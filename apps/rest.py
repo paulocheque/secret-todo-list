@@ -125,7 +125,9 @@ class ApiHandler(tornado.web.RequestHandler):
     def get_signature(self, secret_key, data):
         dataPrepared = []
         for key in sorted(data.keys()):
-            dataPrepared.append(key.lower() + "=" + (data[key] if data[key] else ''))
+            token = key.lower() + "=" + (data[key] if data[key] else '')
+            # print(token)
+            dataPrepared.append(token)
         dataPrepared = '&'.join(dataPrepared)
         string = '__'.join([self.request.method, self.request.path, dataPrepared])
         string = string.encode('utf-8')
