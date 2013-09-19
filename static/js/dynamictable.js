@@ -119,6 +119,10 @@ if (typeof String.prototype.contains != 'function') {
     }
 })(jQuery);
 
+function htmlEscape(text) {
+    return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 function createUpdateForm(url) {
     var form = $("<form>").attr("action", url).attr("method", "put").attr("class", "form-update");
     form.append('<button type="submit" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></button>');

@@ -95,7 +95,7 @@
                 });
             };
             var data = {};
-            $(this).serializeArray().map(function(x){ data[x.name] = encodeURIComponent(x.value); });
+            $(this).serializeArray().map(function(x){ data[x.name] = htmlEscape(x.value); });
             client.update(lineId, data, success, defaultErrorHandler);
         });
         modalObj.modal();
@@ -127,7 +127,7 @@
         $(".form-create").on('submit', function (e) {
             e.preventDefault();
             var data = {};
-            $(this).serializeArray().map(function(x){ data[x.name] = encodeURIComponent(x.value); });
+            $(this).serializeArray().map(function(x){ data[x.name] = htmlEscape(x.value); });
             var success = function(response, status) {
                 createTaskLine(response);
                 $(".form-create").each(function(){ this.reset(); });
