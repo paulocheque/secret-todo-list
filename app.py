@@ -38,7 +38,6 @@ TORNADO_ROUTES = [
     (r'/tasks', TasksHandler),
     (r'/api/tasks', TaskCrudHandler),
     (r'/api/tasks/([0-9a-fA-F]{24,})', TaskCrudHandler),
-    (r'/api/tasks/([0-9a-fA-F]{24,})/delete', TaskCrudHandler),
 ]
 
 application = tornado.web.Application(routes(TORNADO_ROUTES), **TORNADO_SETTINGS)

@@ -156,6 +156,12 @@ function createDeleteForm(url) {
     return form;
 }
 
+function createDeleteForm2() {
+    var form = $("<form>").attr("method", "delete").attr("class", "form-delete");
+    form.append('<button type="submit" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></button>');
+    return form;
+}
+
 function createEditableField(name, value) {
     var fixed = $("span").html(value);
     var editable = $("input").attr("type", "text").attr("class", "").attr("name", name).attr("value", value);
@@ -214,6 +220,38 @@ function createModalWithForm(id, url, formContent, callbackSuccess, callbackErro
         modal.find('input:text')[0].focus();
     });
     return modal;
+}
+
+function createModalWithForm2(id, formContent) {
+    var modal = $("<div/>").attr("id", id).attr("class", "modal fade");
+    var divDialog = $("<div/>").attr("class", "modal-dialog");
+    var divContent = $("<div/>").attr("class", "modal-content");
+    var form = $("<form>").attr("class", "form-update");
+    var divHeader = $("<div/>").attr("class", "modal-header");
+    var divBody = $("<div/>").attr("class", "modal-body");
+    var divFooter = $("<div/>").attr("class", "modal-footer");
+    divHeader.append($("<button/>").attr("type", "button").attr("class", "close").attr("aria-hidden", "true").attr("data-dismiss", "modal").html("&times;"));
+    divHeader.append($("<h4/>").attr("class", "modal-title").html("Editing"));
+    divBody.append(formContent);
+    divFooter.append($("<button/>").attr("type", "button").attr("class", "btn btn-default").attr("data-dismiss", "modal").html("Close"));
+    divFooter.append($("<button/>").attr("type", "submit").attr("class", "btn btn-primary").html("Save"));
+
+    form.append(formContent);
+    form.append(divBody);
+    form.append(divFooter);
+    divContent.append(divHeader);
+    divContent.append(form);
+    divDialog.append(divContent);
+    modal.append(divDialog);
+    modal.attr('tabindex', -1); // fix bootstrap keyboard ESC issue
+    modal.on('hidden.bs.modal', function () {
+        $(this).data('bs.modal', null);
+        modal.remove();
+    });
+    modal.on('shown.bs.modal', function() {
+        modal.find('input:text')[0].focus();
+    });
+    return [modal, form];
 }
 
 function createInput(name, label, value, type, properties) {

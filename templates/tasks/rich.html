@@ -54,33 +54,50 @@
     <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
 
     <script src="/static/js/jquery.pnotify.min.js"></script>
-    <script src="/static/js/dynamictable.js"></script>
-    <script src="/static/js/jquery.rest.min.js"></script>
     <script src="/static/js/jquery.tablesorter.min.js"></script>
     <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/hmac-sha256.js"></script>
+    <script src="/static/js/enc-base64-min.js"></script>
+    <script src="/static/js/dynamictable.js"></script>
+    <script src="/static/js/secret-rest-request.js"></script>
 
     <script language="JavaScript">
-    var client = new $.RestClient('/api/');
-    client.add('tasks', { stripTrailingSlash: true });
+    var client = new SecretRestClient("{{ current_user.secret_key }}", "{{ current_user.id }}", "/api/tasks", "1");
+
+    var defaultErrorHandler = function(response, status) {
+        $.pnotify({
+            type: 'notice',
+            delay: 3000,
+            title: 'Invalid action',
+            text: 'Could not retrieve server data right now'
+        });
+    };
 
     function createUpdateTasksFormModal(lineId) {
         var formData = $("#" + lineId).getData();
         var modalId = "updateFormModal";
-        var callbackSuccess = function(data, status) {
-            $("#" + modalId).removeModal();
-            var line = $("#" + data._id);
-            line.refreshTableLine(function(data, status) {
-                var completed = createCheckbox("completed", data.completed);
-                line.updateTableLine(data, [data.priority, data.due_date, data.description, completed]);
-                line.fadeOut().fadeIn();
-            });
-        };
-        var url = "/api/tasks/" + formData._id;
         var a = createInput("description", "Description", formData.description || "");
         var b = createInput("due_date", "Due date", formData.due_date || "");
         var c = createSelect("priority", "Priority", [{label: "1", value: "1"}, {label: "2", value: "2"}, {label: "3", value: "3"}], formData.priority || "");
         var formContent = $("<div/>").append(a).append(b).append(c);
-        var modalObj = createModalWithForm(modalId, url, formContent, callbackSuccess);
+        var objs = createModalWithForm2(modalId, formContent);
+        var modalObj = objs[0];
+        var updateForm = objs[1];
+        updateForm.on('submit', function (e) {
+            e.preventDefault();
+            var success = function(response, status) {
+                $("#" + modalId).removeModal();
+                var line = $("#" + response._id);
+                client.read(lineId, function(data, status) {
+                    var completed = createCheckbox("completed", data.completed);
+                    line.updateTableLine(data, [data.priority, data.due_date, data.description, completed]);
+                    line.fadeOut().fadeIn();
+                });
+            };
+            var data = {};
+            $(this).serializeArray().map(function(x){ data[x.name] = x.value; });
+            client.update(lineId, data, success, defaultErrorHandler);
+        });
         modalObj.modal();
     }
 
@@ -88,28 +105,43 @@
         var updateButton = createUpdateButtonModal(function() {
             createUpdateTasksFormModal(data._id);
         });
-        var deleteForm = createDeleteForm("/api/tasks/" + data._id + "/delete");
+        var deleteForm = createDeleteForm2();
+        deleteForm.on('submit', function (e) {
+            e.preventDefault();
+            var success = function(response, status) {
+                $(this).closest("tr").deleteTableLine();
+            };
+            client.del(data._id, success, defaultErrorHandler);
+        });
+
         var url = "/api/tasks/" + data._id;
         var completed = createCheckbox("completed", data.completed);
         completed.change(function() {
             var value = $(this).is(":checked");
-            client.tasks.update(data._id, {completed:value});
+            client.update(data._id, {completed:value});
         });
         $("#table-list").createTableLine(data, data._id, url, [data.priority, data.due_date, data.description, completed, updateButton, deleteForm]);
     }
 
     $(document).ready(function() {
-        $(".form-create").asyncForm(function(data, status) {
-            createTaskLine(data);
-            $(this).each(function(){ this.reset(); });
+        $(".form-create").on('submit', function (e) {
+            e.preventDefault();
+            var data = {};
+            $(this).serializeArray().map(function(x){ data[x.name] = x.value; });
+            var success = function(response, status) {
+                createTaskLine(response);
+                $(".form-create").each(function(){ this.reset(); });
+            };
+            client.create(data, success, defaultErrorHandler);
         });
 
-        $("#table-list").populateTable(function(lines, status) {
+        client.list(0, 50, function(lines, status) {
             for (var i in lines) {
                 var data = lines[i];
                 createTaskLine(data);
             }
-        });
+        }, defaultErrorHandler);
+
         var textExtraction = function(node) {
             if (node.innerHTML.startsWith("<input")) {
                 if(node.innerHTML.contains("checked")) {

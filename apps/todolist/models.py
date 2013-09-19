@@ -6,7 +6,7 @@ from apps.accounts.models import User
 
 
 class Task(Document):
-    # user = ReferenceField(User, required=True)
+    user = ReferenceField(User, required=True)
     description = StringField(required=True)
     priority = IntField(required=False, default=2, choices=[1, 2, 3])
     due_date = DateTimeField(required=False)

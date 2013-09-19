@@ -1,12 +1,12 @@
 # coding: utf-8
 from models import Task
-from apps.rest import RestHandler, MongoEngineDataManager
+from apps.rest import RestHandler, MongoEngineDataManagerPerUser
 from apps.base import TodoListHandler
 
 
 class Home(TodoListHandler):
     def get(self):
-        if self.current_user():
+        if self.get_current_user():
             self.render('tasks/rich.html')
         else:
             self.render('main.html')
@@ -14,8 +14,13 @@ class Home(TodoListHandler):
 
 class TasksHandler(TodoListHandler):
     def get(self):
-        self.render('tasks/rich.html')
+        if self.get_current_user():
+            self.render('tasks/rich.html')
+        else:
+            self.render('main.html')
 
 
 class TaskCrudHandler(RestHandler):
-    data_manager = MongoEngineDataManager(Task)
+    def prepare(self):
+        super(TaskCrudHandler, self).prepare()
+        self.data_manager = MongoEngineDataManagerPerUser(Task, self.get_current_user())
