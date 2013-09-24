@@ -126,6 +126,7 @@
           $("#my-todo-lists").append(li);
       }
 
+      {% if current_user %}
       var client = new SecretRestClient("{{ current_user.secret_key }}", "{{ current_user.id }}", "/api/todolists", "1");
       client.list(0, 50, function(lines, status) {
           for (var i in lines) {
@@ -133,6 +134,7 @@
               createMenuItem(data);
           }
       }, null);
+      {% end %}
     });
     </script>
 
