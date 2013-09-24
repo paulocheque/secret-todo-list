@@ -308,3 +308,8 @@ function createFormCheckbox(name, label, value) {
     div.append(labelComponent);
     return div;
 }
+
+function createLink(href, label) {
+    var link = $("<a/>").attr("href", href).html(label);
+    return link;
+}

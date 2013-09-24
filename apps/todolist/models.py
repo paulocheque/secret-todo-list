@@ -5,8 +5,13 @@ from mongoengine import *
 from apps.accounts.models import User
 
 
-class Task(Document):
+class TodoList(Document):
     user = ReferenceField(User, required=True)
+    name = StringField(required=True)
+
+
+class Task(Document):
+    todolist = ReferenceField(TodoList, required=True)
     description = StringField(required=True)
     priority = IntField(required=False, default=2, choices=[1, 2, 3])
     due_date = DateTimeField(required=False)

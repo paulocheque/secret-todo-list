@@ -35,9 +35,13 @@ TORNADO_ROUTES = [
     (r'/change_password', ResetPasswordHandler),
     (r'/account', UserPageHandler),
 
-    (r'/tasks', TasksHandler),
-    (r'/api/tasks', TaskCrudHandler),
-    (r'/api/tasks/([0-9a-fA-F]{24,})', TaskCrudHandler),
+    (r'/todolists', TodoListsHandler),
+    (r'/api/todolists', TodoListCrudHandler),
+    (r'/api/todolists/([0-9a-fA-F]{24,})', TodoListCrudHandler),
+
+    (r'/todolist/([0-9a-fA-F]{24,})/tasks', TasksHandler),
+    (r'/api/todolist/([0-9a-fA-F]{24,})/tasks', TaskCrudHandler),
+    (r'/api/todolist/([0-9a-fA-F]{24,})/tasks/([0-9a-fA-F]{24,})', TaskCrudHandler),
 ]
 
 application = tornado.web.Application(routes(TORNADO_ROUTES), **TORNADO_SETTINGS)

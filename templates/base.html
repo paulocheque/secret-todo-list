@@ -45,6 +45,17 @@
         <a class="navbar-brand" href="/">Secret TODO List</a>
 
         <div class="navbar-collapse collapse navbar-responsive-collapse">
+          <ul class="nav navbar-nav">
+          {% if not current_user or current_user == 'None' %}
+          {% else %}
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">My TODO Lists <b class="caret"></b></a>
+              <ul class="dropdown-menu" id="my-todo-lists">
+              </ul>
+            </li>
+          {% end %}
+          </ul>
+
           <ul class="nav navbar-nav pull-right">
           {% if not current_user or current_user == 'None' %}
           {% else %}
@@ -54,8 +65,8 @@
                 <li><a href="/logout" class="pull-right">Log Out {{ current_user.email }}</a></li>
               </ul>
             </li>
-          </ul>
           {% end %}
+          </ul>
 
           <ul class="nav navbar-nav pull-right">
           {% if not current_user or current_user == 'None' %}
@@ -99,7 +110,32 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/static/js/jquery-2.0.3.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/jquery.pnotify.min.js"></script>
+    <script src="/static/js/jquery.tablesorter.min.js"></script>
+    <script src="/static/js/hmac-sha256.js"></script>
+    <script src="/static/js/enc-base64-min.js"></script>
+    <script src="/static/js/dynamictable.js"></script>
+    <script src="/static/js/secret-rest-request.js"></script>
     <script src="/static/js/custom.js"></script>
+
+    <script language="JavaScript">
+    $(document).ready(function() {
+      function createMenuItem(data) {
+          var linkName = createLink("/todolist/" + data._id + "/tasks", data.name);
+          var li = $("<li/>").append(linkName);
+          $("#my-todo-lists").append(li);
+      }
+
+      var client = new SecretRestClient("{{ current_user.secret_key }}", "{{ current_user.id }}", "/api/todolists", "1");
+      client.list(0, 50, function(lines, status) {
+          for (var i in lines) {
+              var data = lines[i];
+              createMenuItem(data);
+          }
+      }, null);
+    });
+    </script>
+
     {% block js %}{%end%}
 
   </body>
