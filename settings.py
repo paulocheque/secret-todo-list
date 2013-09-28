@@ -24,7 +24,7 @@ TORNADO_SETTINGS = dict(
 
     facebook_redirect_uri='http://%s/auth/facebook' % DOMAIN,
     facebook_api_key=os.environ.get('FACEBOOK_API_KEY', ''),
-    facebook_secret=os.environ.get('FACEBOOK_SECRET', '')
+    facebook_secret=os.environ.get('FACEBOOK_SECRET', ''),
 
     github_redirect_uri='http://%s/auth/github' % DOMAIN,
     github_client_id=os.environ.get('GITHUB_CLIENT_ID', ''),
