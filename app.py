@@ -38,10 +38,12 @@ TORNADO_ROUTES = [
     (r'/todolists', TodoListsHandler),
     (r'/api/todolists', TodoListCrudHandler),
     (r'/api/todolists/([0-9a-fA-F]{24,})', TodoListCrudHandler),
+    (r'/api/todolists/count', TodoListCrudHandler),
 
     (r'/todolist/([0-9a-fA-F]{24,})/tasks', TasksHandler),
     (r'/api/todolist/([0-9a-fA-F]{24,})/tasks', TaskCrudHandler),
     (r'/api/todolist/([0-9a-fA-F]{24,})/tasks/([0-9a-fA-F]{24,})', TaskCrudHandler),
+    (r'/api/todolist/([0-9a-fA-F]{24,})/tasks/count', TaskCrudHandler),
 ]
 
 application = tornado.web.Application(routes(TORNADO_ROUTES), **TORNADO_SETTINGS)

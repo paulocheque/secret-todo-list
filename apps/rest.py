@@ -10,6 +10,9 @@ class MongoEngineDataManager(object):
     def read_list(self, initial=0, amount=50):
         return self.model.objects.all()[initial:initial+amount]
 
+    def count(self):
+        return self.read_list().count()
+
     def read(self, identifier):
         try:
             return self.read_list().get(pk=identifier)
@@ -68,11 +71,14 @@ class RestHandler(ApiHandler):
     # READ /objs/:id
     def get(self, identifier=None):
         if identifier:
-            obj = self.data_manager.read(identifier)
-            if obj:
-                self.answer(obj)
+            if identifier == 'count':
+                self.answer(self.data_manager.count())
             else:
-                self.answer(obj)
+                obj = self.data_manager.read(identifier)
+                if obj:
+                    self.answer(obj)
+                else:
+                    self.answer(obj)
         else:
             # FIXME pagination
             initial = int(self.get_argument('initial', default=0))

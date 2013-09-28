@@ -18,6 +18,9 @@ class MongoEngineComplexDataManager(object):
             filters[f.__name__.lower()] = f.objects(pk=value).get()
         return self.model.objects(**filters).all()[initial:initial+amount]
 
+    def count(self):
+        return self.read_list().count()
+
     def read(self, identifiers):
         identifier = identifiers[-1]
         try:
@@ -82,7 +85,9 @@ class ComplexRestHandler(ApiHandler):
     # LIST /objs/
     # READ /objs/:id
     def get(self, *identifiers, **kwargs):
-        if len(identifiers) == self.data_manager.expected_keys():
+        if len(identifiers) == 1 and identifiers[0] == 'count':
+            self.answer(self.data_manager.count())
+        elif len(identifiers) == self.data_manager.expected_keys():
             obj = self.data_manager.read(identifiers)
             if obj:
                 self.answer(obj)

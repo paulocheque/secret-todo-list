@@ -81,6 +81,12 @@
             this._request(method, url, data, success, error);
         };
 
+        this.count = function(success, error) {
+            var method = "GET";
+            var url = this.apiPrefix + "/count";
+            this._request(method, url, null, success, error);
+        };
+
         this.create = function(data, success, error) {
             var method = "POST";
             var url = this.apiPrefix;
