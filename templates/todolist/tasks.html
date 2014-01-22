@@ -83,7 +83,7 @@
                 var line = $("#" + response._id);
                 client.read(lineId, function(data, status) {
                     var completed = createCheckbox("completed", data.completed);
-                    line.updateTableLine(data, [data.priority, data.due_date, data.description, completed]);
+                    line.updateTableLine(data, [data.priority, data.due_date, linkify(data.description), completed]);
                     line.fadeOut().fadeIn();
                 });
             };
@@ -113,7 +113,7 @@
             var value = $(this).is(":checked");
             client.update(data._id, {completed:value});
         });
-        $("#table-list").createTableLine(data, data._id, url, [data.priority, data.due_date, data.description, completed, updateButton, deleteForm]);
+        $("#table-list").createTableLine(data, data._id, url, [data.priority, data.due_date, linkify(data.description), completed, updateButton, deleteForm]);
     }
 
     $(document).ready(function() {
