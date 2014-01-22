@@ -1,10 +1,10 @@
 // Example of Usage:
 // var client = new SecretRestClient("private", "public", "/api/tasks", "1");
 // client.list();
-// client.read(111);
+// client.read("111");
 // client.create({data:"data1"});
-// client.update(111, {data:"data1"});
-// client.del(111);
+// client.update("111", {data:"data1"});
+// client.del("111");
 (function() {
     var SecretRestClient = function(privateKey, publicKey, apiPrefix, apiVersion) {
         this.privateKey = privateKey;

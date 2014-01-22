@@ -2,10 +2,10 @@
 from models import TodoList, Task
 from apps.rest import RestHandler, MongoEngineDataManagerPerUser
 from apps.complex_rest import ComplexRestHandler, MongoEngineComplexDataManagerPerUser
-from apps.base import TodoListHandler
+from apps.base import BaseHandler
 
 
-class Home(TodoListHandler):
+class Home(BaseHandler):
     def get(self):
         if self.get_current_user():
             self.render('todolist/todolists.html')
@@ -13,7 +13,7 @@ class Home(TodoListHandler):
             self.render('main.html')
 
 
-class TodoListsHandler(TodoListHandler):
+class TodoListsHandler(BaseHandler):
     def get(self):
         if self.get_current_user():
             self.render('todolist/todolists.html')
@@ -21,7 +21,7 @@ class TodoListsHandler(TodoListHandler):
             self.render('main.html')
 
 
-class TasksHandler(TodoListHandler):
+class TasksHandler(BaseHandler):
     def get(self, todolist_id):
         if self.get_current_user():
             self.render('todolist/tasks.html', todolist_id=todolist_id)

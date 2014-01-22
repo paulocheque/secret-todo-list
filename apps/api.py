@@ -49,16 +49,16 @@ class ApiHandler(tornado.web.RequestHandler):
 
     def authenticate(self):
         user = self.get_current_user()
-        client_publick_key = self.get_argument('auth_public_key', None)
+        client_public_key = self.get_argument('auth_public_key', None)
         client_signature = self.get_argument('auth_signature', None)
         client_timestamp = self.get_argument('auth_timestamp', None)
-        if user and client_publick_key and client_signature and client_timestamp:
+        if user and client_public_key and client_signature and client_timestamp:
             # print("User id: " + str(user.id))
-            # print("Public key: " + client_publick_key)
+            # print("Public key: " + client_public_key)
             server_signature = self.get_signature(user.secret_key, self.get_request_data())
             # print("Client signature: " + client_signature)
             # print("Server signature: " + server_signature)
-            if str(user.id) != client_publick_key:
+            if str(user.id) != client_public_key:
                 print('401 for user id')
                 self.raise401()
             if server_signature != client_signature:
@@ -71,13 +71,13 @@ class ApiHandler(tornado.web.RequestHandler):
             self.raise403()
 
     def get_signature(self, secret_key, data):
-        dataPrepared = []
+        data_prepared = []
         for key in sorted(data.keys()):
             token = key.lower() + "=" + (data[key] if data[key] else '')
             # print(token)
-            dataPrepared.append(token)
-        dataPrepared = '&'.join(dataPrepared)
-        string = '__'.join([self.request.method, self.request.path, dataPrepared])
+            data_prepared.append(token)
+        data_prepared = '&'.join(data_prepared)
+        string = '__'.join([self.request.method, self.request.path, data_prepared])
         string = string.encode('utf-8')
         secret_key = secret_key.encode('utf-8')
         # print("Data for signature: " + string)

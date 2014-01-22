@@ -4,7 +4,7 @@ import tornado.web
 from apps.accounts.models import User
 
 
-class TodoListHandler(tornado.web.RequestHandler):
+class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         email = self.get_secure_cookie('user')
         if email is None:
@@ -20,4 +20,4 @@ class TodoListHandler(tornado.web.RequestHandler):
             kwargs['alert'] = None
         if 'current_user' not in kwargs:
             kwargs['current_user'] = self.get_current_user()
-        return super(TodoListHandler, self).render(template_name, **kwargs)
+        return super(BaseHandler, self).render(template_name, **kwargs)
