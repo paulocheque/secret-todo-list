@@ -75,3 +75,8 @@ class User(Document):
             errors['password'] = ValidationError(msg, field_name='password')
         if errors:
             raise ValidationError('ValidationError', errors=errors)
+
+# Migration
+users = User.objects.filter(secret_key=None)
+for u in users:
+    u.save()
