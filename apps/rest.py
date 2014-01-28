@@ -53,7 +53,8 @@ class MongoEngineDataManagerPerUser(MongoEngineDataManager):
     def create(self, data, persist=False):
         obj = super(MongoEngineDataManagerPerUser, self).create(data, persist=persist)
         obj.user = self.user
-        obj.save()
+        if persist:
+            obj.save()
         return obj
 
 

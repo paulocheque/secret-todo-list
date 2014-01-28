@@ -12,7 +12,7 @@ SOCIAL_CHOICES = (('GH', 'GitHub'), ('F', 'Facebook'), ('G', 'Google'), ('T', 'T
 class User(Document):
     email = EmailField(required=True)
     password = StringField(required=True)
-    registered_on = DateTimeField(required=True, default=datetime.utcnow())
+    registered_on = DateTimeField(required=True, default=datetime.utcnow)
 
     secret_key = StringField(required=True)
 

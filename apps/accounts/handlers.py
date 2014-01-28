@@ -58,7 +58,7 @@ class RegisterHandler(AccountsHandler):
             user = User(email=email, password=pw, internal_password=internal_password)
             user.save(encrypt_pass=True)
             self.set_secure_cookie('user', user.email)
-            self.redirect('/')
+            self.redirect(self.post_login_redirect_url())
         except ValidationError as e:
             return self.render('accounts/register.html', alert=str(e))
 
@@ -74,7 +74,7 @@ class LoginHandler(AccountsHandler):
         user = user[0]
 
         self.set_secure_cookie('user', user.email)
-        self.redirect('/')
+        self.redirect(self.post_login_redirect_url())
 
 
 class LogoutHandler(AccountsHandler):
@@ -89,7 +89,7 @@ class ResetPasswordHandler(AccountsHandler):
         new_password = self.get_argument('password', None)
         try:
             self.current_user.change_password(current_password, new_password)
-            self.redirect('/')
+            self.redirect(self.post_login_redirect_url())
         except ValidationError as e:
             self.render('accounts/user_page.html', alert=str(e))
 

@@ -1,10 +1,26 @@
-// Example of Usage:
-// var client = new SecretRestClient("private", "public", "/api/tasks", "1");
-// client.list();
-// client.read("111");
-// client.create({data:"data1"});
-// client.update("111", {data:"data1"});
-// client.del("111");
+/*
+RFC 2104 HMAC-SHA1
+HMAC-SHA256
+http://www.ietf.org/rfc/rfc2104.txt
+http://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html
+http://www.thebuzzmedia.com/designing-a-secure-rest-api-without-oauth-authentication/
+Dependencies:
+http://jquery.com
+https://code.google.com/p/crypto-js/#SHA-2
+https://code.google.com/p/crypto-js/#Encoders
+Example of Usage:
+<script src="/static/js/jquery-2.0.3.min.js"></script>
+<script src="/static/js/hmac-sha256.js"></script>
+<script src="/static/js/enc-base64-min.js"></script>
+<script src="/static/js/secret-rest-request.js"></script>
+var client = new SecretRestClient("private", "public", "/api/tasks", "1");
+client.list();
+client.read("111");
+client.create({data:"data1"});
+client.update("111", {data:"data1"});
+client.del("111");
+client.count();
+*/
 (function() {
     var SecretRestClient = function(privateKey, publicKey, apiPrefix, apiVersion) {
         this.privateKey = privateKey;
@@ -68,7 +84,8 @@
             $.ajax({
                 method: method,
                 url: url,
-                data: authenticatedData
+                data: authenticatedData,
+                beforeSend: function (xhr) { xhr.setRequestHeader("Authorization", "HMAC-SHA256 " + signature); }
             }).done($.proxy(success, this)).fail($.proxy(error, this));
         };
 

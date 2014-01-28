@@ -10,7 +10,7 @@ six==1.4.1
 python-rest-handler==0.0.2
 tornado-rest-handler==0.0.7
 
-mongoengine==0.8.4
-pymongo==2.6
+mongoengine==0.8.7
+pymongo==2.6.3
 
 simplejson==3.3.0
