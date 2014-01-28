@@ -1,0 +1,9 @@
+date picker com modal erro
+spinner
+#tasks
+sort table
+deploy
+
+formEdit != formUpdate
+minifier erro window.?
+adicionar min no passwords e todolist?

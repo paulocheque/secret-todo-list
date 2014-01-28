@@ -47,7 +47,7 @@ class ApiHandler(tornado.web.RequestHandler):
         if user and client_public_key and client_signature and client_timestamp:
             # print("User id: " + str(user.id))
             # print("Public key: " + client_public_key)
-            server_signature = self.get_signature(user.secret_key, self.get_request_data())
+            server_signature = self.get_signature(user.secret_key, self.get_request_string_data())
             # print("Client signature: " + client_signature)
             # print("Server signature: " + server_signature)
             if str(user.id) != client_public_key:
@@ -65,7 +65,7 @@ class ApiHandler(tornado.web.RequestHandler):
     def get_signature(self, secret_key, data):
         data_prepared = []
         for key in sorted(data.keys()):
-            token = key.lower() + "=" + (data[key] if data[key] else '')
+            token = key.lower() + "=" + (data[key] if data[key] is not None else '')
             # print(token)
             data_prepared.append(token)
         data_prepared = '&'.join(data_prepared)
@@ -80,6 +80,14 @@ class ApiHandler(tornado.web.RequestHandler):
         # print("Signature: " + signature)
         return signature
 
+    def get_request_string_data(self):
+        data = {}
+        for arg in list(self.request.arguments.keys()):
+            if arg in ['auth_version', 'auth_public_key', 'auth_timestamp', 'auth_signature']:
+                continue
+            data[arg] = self.get_argument(arg)
+        return data
+
     def get_request_data(self):
         data = {}
         for arg in list(self.request.arguments.keys()):
@@ -88,6 +96,8 @@ class ApiHandler(tornado.web.RequestHandler):
             data[arg] = self.get_argument(arg)
             if data[arg] == '': # Tornado 3.0+ compatibility
                 data[arg] = None
-            if data[arg] and data[arg].lower() in ['false']:
+            elif data[arg] and data[arg].lower() in ['false']:
                 data[arg] = False
+            elif data[arg] and data[arg].lower() in ['true']:
+                data[arg] = True
         return data

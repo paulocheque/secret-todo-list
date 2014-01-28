@@ -6,10 +6,7 @@
   <h1>TODO list <small>tasks</small></h1>
 </div>
 
-
-<h2><small>New</small></h2>
-
-<form id="form-create" class="form-create form-inline" role="form">
+<form id="form-create" class="form-create form-inline" role="form" style="display:none;">
     <div class="form-group">
         <label for="description">Task description</label>
         <input id="description" name="description" type="text" placeholder="add new task" class="input-xlarge form-control" required="" autocomplete="off" autofocus/>
@@ -28,9 +25,6 @@
     </div>
     <button type="submit" class="btn btn-primary" style="vertical-align: bottom;">Add</button>
 </form>
-
-
-<h2><small>Tasks</small></h2>
 
 <table id="table-list" class="table table-striped table-hover table-condensed table-responsive tablesorter">
     <thead>
@@ -66,75 +60,7 @@
         });
     };
 
-    function createUpdateTasksFormModal(lineId) {
-        var formData = $("#" + lineId).getData();
-        var modalId = "updateFormModal";
-        var a = createInput("description", "Description", formData.description || "");
-        var b = createInput("due_date", "Due date", formData.due_date || "");
-        var c = createSelect("priority", "Priority", [{label: "1", value: "1"}, {label: "2", value: "2"}, {label: "3", value: "3"}], formData.priority || "");
-        var formContent = $("<div/>").append(a).append(b).append(c);
-        var objs = createModalWithForm2(modalId, formContent);
-        var modalObj = objs[0];
-        var updateForm = objs[1];
-        updateForm.on('submit', function (e) {
-            e.preventDefault();
-            var success = function(response, status) {
-                $("#" + modalId).removeModal();
-                var line = $("#" + response._id);
-                client.read(lineId, function(data, status) {
-                    var completed = createCheckbox("completed", data.completed);
-                    line.updateTableLine(data, [data.priority, data.due_date, linkify(data.description), completed]);
-                    line.fadeOut().fadeIn();
-                });
-            };
-            var data = {};
-            $(this).serializeArray().map(function(x){ data[x.name] = htmlEscape(x.value); });
-            client.update(lineId, data, success, defaultErrorHandler);
-        });
-        modalObj.modal();
-    }
-
-    function createTaskLine(data) {
-        var updateButton = createUpdateButtonModal(function() {
-            createUpdateTasksFormModal(data._id);
-        });
-        var deleteForm = createDeleteForm2();
-        deleteForm.on('submit', function (e) {
-            e.preventDefault();
-            var success = function(response, status) {
-                deleteForm.closest("tr").deleteTableLine();
-            };
-            client.del(data._id, success, defaultErrorHandler);
-        });
-
-        var url = "/api/tasks/" + data._id;
-        var completed = createCheckbox("completed", data.completed);
-        completed.change(function() {
-            var value = $(this).is(":checked");
-            client.update(data._id, {completed:value});
-        });
-        $("#table-list").createTableLine(data, data._id, url, [data.priority, data.due_date, linkify(data.description), completed, updateButton, deleteForm]);
-    }
-
     $(document).ready(function() {
-        $(".form-create").on('submit', function (e) {
-            e.preventDefault();
-            var data = {};
-            $(this).serializeArray().map(function(x){ data[x.name] = htmlEscape(x.value); });
-            var success = function(response, status) {
-                createTaskLine(response);
-                $(".form-create").each(function(){ this.reset(); });
-            };
-            client.create(data, success, defaultErrorHandler);
-        });
-
-        client.list(0, 50, function(lines, status) {
-            for (var i in lines) {
-                var data = lines[i];
-                createTaskLine(data);
-            }
-        }, defaultErrorHandler);
-
         var textExtraction = function(node) {
             if (node.innerHTML.startsWith("<input")) {
                 if(node.innerHTML.contains("checked")) {
@@ -146,9 +72,61 @@
                 return node.innerHTML;
             }
         }
-        $("#table-list").tablesorter({textExtraction:textExtraction});
-        // $('#priority').spinner({min:1, max:3});
-        $('#due_date').datepicker({format: "yyyy/mm/dd"});
+
+        // $("#table-list").tablesorter({textExtraction:textExtraction});
+        var secretTable = new SecretDataTable({
+            table: $("#table-list"),
+            columns: [
+                function(data, id) { return data.priority },
+                function(data, id) { return data.due_date },
+                function(data, id) { return linkify(data.description) },
+                function(data, id) {
+                    var completed = createCheckbox("completed", data.completed);
+                    completed.change(function() {
+                        var value = $(this).is(":checked");
+                        client.update(id, {completed:value});
+                    });
+                    return completed;
+                }
+            ],
+            formCreate: $("#form-create"),
+            formEdit: $("#form-create"),
+            onTableLoad: function(table) {
+                client.list(0, 50, function(lines, status) {
+                    for (var i in lines) {
+                        var data = lines[i];
+                        //console.debug(data);
+                        table.createLine(data._id, data);
+                    }
+                }, defaultErrorHandler);
+            },
+            onCreate: function(table, data) {
+                var successHandler = function(response, status) {
+                    table.createLine(response._id, data);
+                };
+                client.create(data, successHandler, defaultErrorHandler);
+            },
+            onUpdate: function(table, id, data) {
+                var successHandler = function(response, status) {
+                    table.updateLine(id, data);
+                };
+                client.update(id, data, successHandler, defaultErrorHandler);
+            },
+            onDelete: function(table, id, data) {
+                var successHandler = function(response, status) {
+                    table.deleteLine(id, data);
+                };
+                client.del(id, successHandler, defaultErrorHandler);
+            },
+            onTableChange: function(table) {
+                // table.trigger("update");
+                // table.trigger("updateAll");
+            },
+            onModalReady: function(modal){
+                modal.find('[name="due_date"]').datepicker({format: "yyyy/mm/dd"});
+                // modal.find('[name="priority"]').spinner({min:1, max:3});
+            }
+        });
     });
   </script>
 {% end %}
