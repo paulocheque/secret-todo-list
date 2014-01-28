@@ -15,3 +15,16 @@ if (typeof String.prototype.contains != 'function') {
         return this.indexOf(str) !== -1;
     };
 }
+
+function createLink(href, label) {
+    var link = $("<a/>").attr("href", href).html(label);
+    return link;
+}
+
+function createCheckbox(name, value) {
+    var input = $("<input/>").attr("type", "checkbox").attr("name", name).attr("id", name);
+    if (value == true || value == "true") {
+        input.attr("checked", "checked");
+    }
+    return input;
+}
