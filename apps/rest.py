@@ -50,8 +50,8 @@ class MongoEngineDataManagerPerUser(MongoEngineDataManager):
         objs = super(MongoEngineDataManagerPerUser, self).read_list(initial=initial, amount=amount)
         return objs(user=self.user)
 
-    def create(self, data, persist=False):
-        obj = super(MongoEngineDataManagerPerUser, self).create(data, persist=persist)
+    def create(self, data, persist=True):
+        obj = super(MongoEngineDataManagerPerUser, self).create(data, persist=False)
         obj.user = self.user
         if persist:
             obj.save()
@@ -66,7 +66,7 @@ class RestHandler(ApiHandler):
         if obj:
             self.answer(obj)
         else:
-            self.answer(obj)
+            self.raise404()
 
     # LIST /objs/
     # READ /objs/:id
@@ -79,7 +79,7 @@ class RestHandler(ApiHandler):
                 if obj:
                     self.answer(obj)
                 else:
-                    self.answer(obj)
+                    self.raise404()
         else:
             # FIXME pagination
             initial = int(self.get_argument('initial', default=0))
@@ -96,7 +96,7 @@ class RestHandler(ApiHandler):
         if obj:
             self.answer(obj)
         else:
-            self.answer(obj)
+            self.raise404()
 
     # DELETE /objs/:id
     def delete(self, identifier):
@@ -104,5 +104,5 @@ class RestHandler(ApiHandler):
         if obj:
             self.answer(obj)
         else:
-            self.answer(obj)
+            self.raise404()
 

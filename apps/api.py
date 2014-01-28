@@ -1,14 +1,12 @@
 # coding: utf-8
-import collections
 import datetime
 import hmac
 import hashlib
 import base64
 
-import simplejson as json
 import tornado.web
 
-from utils import to_json
+from utils import documents_to_json
 
 from apps.accounts.models import User # FIXME need refactoring
 
@@ -16,13 +14,7 @@ from apps.accounts.models import User # FIXME need refactoring
 class ApiHandler(tornado.web.RequestHandler):
     def answer(self, data):
         self.set_header("Content-Type", "application/json")
-        is_iterable = isinstance(data, collections.Iterable) and hasattr(data, '__iter__') and not hasattr(data, 'to_mongo')
-        # print(type(data), is_iterable, data)
-        if is_iterable:
-            data_obj = [dict(d.to_mongo()) if hasattr(d, 'to_mongo') else d for d in data]
-        else:
-            data_obj = dict(data.to_mongo()) if hasattr(data, 'to_mongo') else data
-        data_json = to_json(data_obj)
+        data_json = documents_to_json(data)
         self.write(data_json)
 
     def raise401(self):

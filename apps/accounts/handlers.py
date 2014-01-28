@@ -5,7 +5,6 @@
 from datetime import datetime
 
 import tornado.web
-from tornado_rest_handler import TornadoRestHandler
 
 from models import *
 
@@ -31,10 +30,6 @@ class AccountsHandler(tornado.web.RequestHandler):
         if 'alert' not in kwargs:
             kwargs['alert'] = None
         super(AccountsHandler, self).render(template_name, **kwargs)
-
-
-class RestAccountsHandler(AccountsHandler, TornadoRestHandler):
-    pass
 
 
 class RegisterHandler(AccountsHandler):

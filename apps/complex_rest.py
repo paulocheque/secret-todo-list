@@ -65,10 +65,11 @@ class MongoEngineComplexDataManagerPerUser(MongoEngineComplexDataManager):
         # return objs(**user_filter)
         return objs
 
-    def create(self, identifiers, data, persist=False):
-        obj = super(MongoEngineComplexDataManagerPerUser, self).create(identifiers, data, persist=persist)
+    def create(self, identifiers, data, persist=True):
+        obj = super(MongoEngineComplexDataManagerPerUser, self).create(identifiers, data, persist=False)
         obj.user = self.user
-        obj.save()
+        if persist:
+            obj.save()
         return obj
 
 

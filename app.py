@@ -8,7 +8,6 @@ import tornado.web
 
 from settings import *
 import db_connection # connect to databases
-from tornado_rest_handler import routes, rest_routes
 
 # apps
 from apps.accounts.handlers import *
@@ -46,7 +45,7 @@ TORNADO_ROUTES = [
     (r'/api/todolist/([0-9a-fA-F]{24,})/tasks/count', TaskCrudHandler),
 ]
 
-application = tornado.web.Application(routes(TORNADO_ROUTES), **TORNADO_SETTINGS)
+application = tornado.web.Application(TORNADO_ROUTES, **TORNADO_SETTINGS)
 
 
 if __name__ == '__main__':
