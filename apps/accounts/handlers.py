@@ -6,30 +6,14 @@ from datetime import datetime
 
 import tornado.web
 
-from models import *
+from .models import *
+
+from apps.utils.base import BaseHandler
 
 
-class AccountsHandler(tornado.web.RequestHandler):
+class AccountsHandler(BaseHandler):
     def post_login_redirect_url(self):
         return self.get_argument('next', self.settings.get('post_login_redirect_url', '/'))
-
-    def get_current_user(self):
-        email = self.get_secure_cookie("user")
-        if email is None:
-            return None
-
-        user = User.objects(email=email)
-
-        try:
-            return user[0]
-        except IndexError:
-            return None
-
-    def render(self, template_name, **kwargs):
-        kwargs['current_user'] = self.get_current_user()
-        if 'alert' not in kwargs:
-            kwargs['alert'] = None
-        super(AccountsHandler, self).render(template_name, **kwargs)
 
 
 class RegisterHandler(AccountsHandler):
@@ -75,7 +59,7 @@ class LoginHandler(AccountsHandler):
 class LogoutHandler(AccountsHandler):
     def get(self):
         self.clear_cookie('user')
-        self.redirect('/')
+        self.redirect(self.post_login_redirect_url())
 
 
 class ResetPasswordHandler(AccountsHandler):

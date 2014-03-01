@@ -7,9 +7,10 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link href="/static/css/bootstrap.css" rel="stylesheet">
-    <link href="/static/css/jquery.pnotify.default.css" rel="stylesheet">
-    <link href="/static/css/jquery.pnotify.default.icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="http://weblibraries.s3.amazonaws.com/jquery.pnotify.default.css">
+    <link rel="stylesheet" href="http://weblibraries.s3.amazonaws.com/jquery.pnotify.default.icons.css">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -25,11 +26,8 @@
     <![endif]-->
 
     <!-- Fav and touch icons -->
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="static/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="static/ico/apple-touch-icon-114-precomposed.png">
-      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="static/ico/apple-touch-icon-72-precomposed.png">
-                    <link rel="apple-touch-icon-precomposed" href="static/ico/apple-touch-icon-57-precomposed.png">
-                                   <link rel="shortcut icon" href="/favicon.ico">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link rel="shortcut icon" href="/favicon.ico">
   </head>
 
   <body>
@@ -58,6 +56,8 @@
 
           <ul class="nav navbar-nav pull-right">
           {% if not current_user or current_user == 'None' %}
+            <li><a href="/auth/facebook" class="btn btn-default btn-xs"><i class="fa fa-facebook-square"></i> Login with Facebook</a></li>
+            <li><a href="/auth/google" class="btn btn-default btn-xs"><i class="fa fa-google-plus-square"></i> Login with Google</a></li>
           {% else %}
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account <b class="caret"></b></a>
@@ -65,6 +65,7 @@
                 <li><a href="/logout" class="pull-right">Log out {{ current_user.email }}</a></li>
               </ul>
             </li>
+          </ul>
           {% end %}
           </ul>
 
@@ -75,8 +76,10 @@
                 <li><a href="http://placasmarcadas.com" target="_blank">PlacasMarcadas</a></li>
                 <li><a href="http://megaloteria.net" target="_blank">MegaLoteria</a></li>
                 <li><a href="http://baladasusp.com" target="_blank">BaladasUSP</a></li>
+                <li class="divider"></li>
                 <li><a href="http://secret-todo-list.herokuapp.com" target="_blank">Secret TODO-List</a></li>
                 <li><a href="http://secret-passwords.herokuapp.com" target="_blank">Secret Passwords</a></li>
+                <li><a href="http://propagation.herokuapp.com" target="_blank">Secret Propagation</a></li>
                 <li><a href="http://secret-ips.herokuapp.com" target="_blank">Secret IPs</a></li>
                 <li class="divider"></li>
                 <li><a href="http://gatournament.com">Game Algorithms Tournament</a></li>
@@ -89,49 +92,57 @@
 
     <div class="container">
       {% if alert is not None %}
-        <div class='alert alert-notice alert-block'>
+        <div class="alert {{ alert_type }} alert-dismissable">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
           {{ alert }}
         </div>
       {% end %}
 
-    <div class="row">
-        <div class="col-lg-12">
-              <iframe src="http://rcm-na.amazon-adsystem.com/e/cm?t=infinsecre-20&o=1&p=48&l=st1&mode=beauty&search=party, beauty&fc1=000000&lt1=_blank&lc1=3366FF&bg1=FFFFFF&f=ifr" marginwidth="0" marginheight="0" width="728" height="90" border="0" frameborder="0" style="border:none;" scrolling="no"></iframe>
-        </div>
-        <div class="col-lg-12">
-              <script type='text/javascript'>
-              <!--
-              xmlECParams='12|728|90|220595|26||WORK_AREA_ADMI||';
-              jobViewColor='0xFFFFFF'; jobBorderColor='0xFFFFFF'; jobBackColor='0xFFFFFF'; jobTitleColor='0x000000'; jobDescriptionColor='0x000000'; jobLocalColor='0xA6A6A6'; jobLegendColor='0xFFFFFF'; jobLegendTextColor='0x000000';
-              -->
-              </script>
-              <script type='text/javascript' src='http://adrequisitor-af.uol.com.br/uolafec.js'></script>
-          </div>
-          <div class="col-lg-12">
-              <script type="text/javascript">
-                bb_bid = "1693003";
-                bb_lang = "en-US";
-                bb_name = "custom";
-                bb_limit = "8";
-                bb_format = "bbb";
-              </script>
-              <script type="text/javascript" src="http://static.boo-box.com/javascripts/embed.js"></script>
-          </div>
-    </div>
-
       <div class="row">
-        {% block content %}{% end %}
+        <div class="col-xs-8 col-md-8 col-lg-8">
+            <iframe src="http://rcm-na.amazon-adsystem.com/e/cm?t=infinsecre-20&o=1&p=48&l=st1&mode=beauty&search=party, beauty&fc1=000000&lt1=_blank&lc1=3366FF&bg1=FFFFFF&f=ifr" marginwidth="0" marginheight="0" width="728" height="90" border="0" frameborder="0" style="border:none;" scrolling="no"></iframe>
+
+            <script type='text/javascript'>
+            <!--
+            xmlECParams='12|728|90|220595|26||WORK_AREA_ADMI||';
+            jobViewColor='0xFFFFFF'; jobBorderColor='0xFFFFFF'; jobBackColor='0xFFFFFF'; jobTitleColor='0x000000'; jobDescriptionColor='0x000000'; jobLocalColor='0xA6A6A6'; jobLegendColor='0xFFFFFF'; jobLegendTextColor='0x000000';
+            -->
+            </script>
+            <script type='text/javascript' src='http://adrequisitor-af.uol.com.br/uolafec.js'></script>
+
+            <script type="text/javascript">
+              bb_bid = "1693003";
+              bb_lang = "en-US";
+              bb_name = "custom";
+              bb_limit = "8";
+              bb_format = "bbb";
+            </script>
+            <script type="text/javascript" src="http://static.boo-box.com/javascripts/embed.js"></script>
+
+            {% block content %}{% end %}
+        </div>
+
+        <div class="col-xs-4 col-md-4 col-lg-4">
+            <script type="text/javascript">
+              bb_bid = "1693003";
+              bb_lang = "en-US";
+              bb_name = "custom";
+              bb_limit = "6";
+              bb_format = "bbn";
+            </script>
+            <script type="text/javascript" src="http://static.boo-box.com/javascripts/embed.js"></script>
+        </div>
       </div>
 
-      <hr>
-
+      <hr/>
     </div>
 
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="http://weblibraries.s3.amazonaws.com/jquery-2.0.3.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/jquery.pnotify.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="http://weblibraries.s3.amazonaws.com/jquery.pnotify.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/jquery.tablesorter.min.js"></script>
+    <script src="http://weblibraries.s3.amazonaws.com/moment.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/ba-linkify.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/hmac-sha256.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/enc-base64.min.js"></script>

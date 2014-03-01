@@ -1,13 +1,13 @@
 # coding: utf-8
 import os
 
+# heroku config:set VARIABLE=value
 DEBUG = False
 
 if DEBUG:
     DOMAIN = 'localhost:5000'
 else:
     DOMAIN = os.environ.get('APP_DOMAIN', 'secret-todo-list.herokuapp.com')
-
 
 TORNADO_SETTINGS = dict(
     gzip=True,

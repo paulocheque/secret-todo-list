@@ -1,11 +1,11 @@
 # coding: utf-8
+from apps.utils.rest import RestHandler, MongoEngineDataManagerPerUser
+from apps.utils.complex_rest import ComplexRestHandler, MongoEngineComplexDataManagerPerUser
+from apps.utils.base import BaseHandler
 from models import TodoList, Task
-from apps.rest import RestHandler, MongoEngineDataManagerPerUser
-from apps.complex_rest import ComplexRestHandler, MongoEngineComplexDataManagerPerUser
-from apps.base import BaseHandler
 
 
-class Home(BaseHandler):
+class HomeHandler(BaseHandler):
     def get(self):
         if self.get_current_user():
             self.render('todolist/todolists.html')

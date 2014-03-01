@@ -31,7 +31,7 @@ end
 
 task :clean => [] do
   sh "rm -rf ~*"
-  sh "rm -rf *.pyc *.pyo"
+  sh "find . -name '*.pyc' -delete"
   sh "rm -rf data/"
   sh "rm -rf *.egg-info"
   sh "rm -rf dist/"
@@ -70,44 +70,100 @@ task :mongo => [] do
   sh "mongod --dbpath=data/db"
 end
 
-task :heroku_create => [] do
-  sh "heroku apps:create #{APP}" if APP
-  sh "heroku addons:add newrelic"
-  # sh "newrelic-admin generate-config YOUR_ID newrelic.ini"
-  sh "heroku addons:add papertrail"
-  sh "heroku addons:add loggly"
-  sh "heroku addons:add redistogo"
-  sh "heroku addons:add mongohq"
-  # sh "heroku addons:add mongolab"
-  sh "heroku domains:add #{DOMAIN}" if DOMAIN
+task :redis => [] do
+  sh "redis-server"
 end
 
-task :heroku => [] do
-  sh "heroku login"
-  sh "heroku config"
-
-  sh "heroku ps:scale web=1"
-  sh "heroku ps"
-  sh "heroku open"
-  sh "heroku logs"
-  sh "heroku logs -t -p worker"
+task :scheduler => [] do
+  sh "rqscheduler"
 end
 
-task :logs => [] do
-  sh "heroku logs --tail"
+task :dashboard => [] do
+  sh "rq-dashboard"
 end
 
-task :console => [] do
-  sh "heroku run python"
+task :monitor => [] do
+  sh "redis-cli info"
+  sh "redis-cli ping"
+  # sh "redis-cli (get key) (set key value)"
 end
 
-task :deploy => [] do
-  sh "git push heroku master"
+namespace :heroku do
+  SERVER = "secret-todolist"
+  WORKER = "secret-todolist-worker"
+  DOMAIN = nil
+
+  task :create => [] do
+    # sh "heroku apps:create #{SERVER}" if SERVER
+    # sh "heroku apps:create #{WORKER}" if WORKER
+    sh "heroku addons:add newrelic --app #{SERVER}"
+    sh "heroku addons:add newrelic --app #{WORKER}"
+    # sh "newrelic-admin generate-config YOUR_ID newrelic.ini"
+    sh "heroku addons:add papertrail --app #{SERVER}"
+    sh "heroku addons:add papertrail --app #{WORKER}"
+    # sh "heroku addons:add loggly --app #{SERVER}"
+    # sh "heroku addons:add loggly --app #{WORKER}"
+    sh "heroku addons:add redistogo --app #{SERVER}"
+    sh "heroku addons:add mongohq --app #{SERVER}"
+    sh "heroku addons:add scheduler --app #{WORKER}"
+    sh "heroku addons:add sendgrid --app #{WORKER}"
+    # sh "heroku addons:add mongolab --app #{SERVER}"
+    # sh "heroku domains:add #{DOMAIN} --app #{SERVER}" if DOMAIN
+  end
+
+  task :status => [] do
+    sh "heroku login"
+    sh "heroku config --app #{SERVER}"
+    sh "heroku config --app #{WORKER}"
+
+    sh "heroku ps --app #{SERVER}"
+    sh "heroku ps --app #{WORKER}"
+    sh "heroku open"
+    sh "heroku logs -t -p worker"
+  end
+
+  task :logs => [] do
+    sh "heroku logs --tail --app #{SERVER}"
+    sh "heroku logs --tail --app #{WORKER}"
+  end
+
+  task :console => [] do
+    sh "heroku run python --app #{WORKER}"
+  end
+
+  task :deploy => [] do
+    REDISTOGO_URL = `heroku config:get REDISTOGO_URL --app #{SERVER}`
+    REDISTOGO_URL.strip!
+    sh "heroku config:set REDIS_URL=#{REDISTOGO_URL} REDISTOGO_URL=#{REDISTOGO_URL} --app #{WORKER}"
+
+    MONGOHQ_URL = `heroku config:get MONGOHQ_URL --app #{SERVER}`
+    MONGOHQ_URL.strip!
+    sh "heroku config:set MONGOHQ_URL=#{MONGOHQ_URL} --app #{WORKER}"
+
+    sh "git push heroku master"
+    sh "heroku ps:scale web=1 --app #{SERVER}"
+    sh "heroku ps:scale worker=0 --app #{SERVER}"
+
+    sh "git push heroku2 master"
+    sh "heroku ps:scale web=0 --app #{WORKER}"
+    sh "heroku ps:scale worker=1 --app #{WORKER}"
+
+    sh "heroku ps --app #{SERVER}"
+    sh "heroku ps --app #{WORKER}"
+    sh "heroku config --app #{SERVER}"
+    sh "heroku config --app #{WORKER}"
+  end
+
+  task :report do
+    sh "heroku run fab report --app #{WORKER}"
+  end
 end
 
 task :compress_js do
   sh "sudo npm install uglify-js -g"
   sh "uglifyjs static/js/*.js -o static/js/code.min.js --source-map code.min.js.map -p relative -c -m"
 end
+
+task :all => [:dev_env, :dependencies, :tests]
 
 task :default => [:tests]
