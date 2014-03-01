@@ -85,9 +85,9 @@ task :monitor => [] do
 end
 
 namespace :heroku do
-  SERVER = "secret-todolist"
+  SERVER = "secret-todo-list"
   WORKER = nil
-  DOMAIN = "secret-todolist.herokuapps.com"
+  DOMAIN = "secret-todo-list.herokuapp.com"
 
   task :create => [] do
     # sh "heroku apps:create #{SERVER}" if SERVER
@@ -128,26 +128,26 @@ namespace :heroku do
   end
 
   task :deploy => [] do
-    REDISTOGO_URL = `heroku config:get REDISTOGO_URL --app #{SERVER}` if SERVER
-    REDISTOGO_URL.strip! if SERVER
-    sh "heroku config:set REDIS_URL=#{REDISTOGO_URL} REDISTOGO_URL=#{REDISTOGO_URL} --app #{WORKER}" if WORKER
+    # REDISTOGO_URL = `heroku config:get REDISTOGO_URL --app #{SERVER}` if SERVER
+    # REDISTOGO_URL.strip! if SERVER
+    # sh "heroku config:set REDIS_URL=#{REDISTOGO_URL} REDISTOGO_URL=#{REDISTOGO_URL} --app #{WORKER}" if WORKER
 
-    MONGOHQ_URL = `heroku config:get MONGOHQ_URL --app #{SERVER}` if SERVER
-    MONGOHQ_URL.strip! if SERVER
-    sh "heroku config:set MONGOHQ_URL=#{MONGOHQ_URL} --app #{WORKER}" if WORKER
+    # MONGOHQ_URL = `heroku config:get MONGOHQ_URL --app #{SERVER}` if SERVER
+    # MONGOHQ_URL.strip! if SERVER
+    # sh "heroku config:set MONGOHQ_URL=#{MONGOHQ_URL} --app #{WORKER}" if WORKER
 
     sh "git push heroku master"
     sh "heroku ps:scale web=1 --app #{SERVER}" if SERVER
     sh "heroku ps:scale worker=0 --app #{SERVER}" if SERVER
 
-    sh "git push heroku2 master"
-    sh "heroku ps:scale web=0 --app #{WORKER}" if WORKER
-    sh "heroku ps:scale worker=1 --app #{WORKER}" if WORKER
+    # sh "git push heroku2 master"
+    # sh "heroku ps:scale web=0 --app #{WORKER}" if WORKER
+    # sh "heroku ps:scale worker=1 --app #{WORKER}" if WORKER
 
     sh "heroku ps --app #{SERVER}" if SERVER
-    sh "heroku ps --app #{WORKER}" if WORKER
+    # sh "heroku ps --app #{WORKER}" if WORKER
     sh "heroku config --app #{SERVER}" if SERVER
-    sh "heroku config --app #{WORKER}" if WORKER
+    # sh "heroku config --app #{WORKER}" if WORKER
   end
 
   task :report do
