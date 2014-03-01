@@ -9,7 +9,8 @@ from fabric.api import task
 
 import connect_mongo
 from apps.accounts.models import User
-from apps.app.tasks import *
+from apps.todolist.models import *
+# from apps.todolist.tasks import *
 
 
 # https://gist.github.com/paulocheque/5906909
@@ -25,3 +26,6 @@ def colorize(message, color='blue'):
 def report():
     print('%s users' % User.objects.count())
     print('-' * 50)
+    print('%s todolists' % TodoList.objects.count())
+    print('%s tasks' % Task.objects.count())
+    print('%s completed tasks' % Task.objects(completed=True).count())
