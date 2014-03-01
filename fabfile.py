@@ -24,3 +24,4 @@ def colorize(message, color='blue'):
 @task
 def report():
     print('%s users' % User.objects.count())
+    print('-' * 50)
