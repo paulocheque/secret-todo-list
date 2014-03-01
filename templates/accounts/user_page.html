@@ -1,0 +1,66 @@
+{% extends "../base.html" %}
+
+{% block js %}
+  <script language="JavaScript">
+
+    // confirm that the two passwords match before the user can submit
+    function pwConfirm(){
+      if ($('#password1').val() != $('#password2').val() || $('#password1').val().trim() == ''){
+        $('#pw_button').val('New passwords must match').attr('disabled', 'disabled');
+      } else {
+        $('#pw_button').val('Change password').removeAttr('disabled');
+      }
+    }
+  </script>
+{% end %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Account information <small>management</small></h1>
+</div>
+
+<div class='col-md-12'>
+  <ul>
+    <li>Email address: {{ current_user.email }}</li>
+    <li>Registered on: {{ current_user.registered_on }}</li>
+  </ul>
+</div>
+
+<div class='col-md-12'>
+  <h2>Reset your password</h2>
+
+  <form id="form-create" class="form-create form" role="form" action="/change_password" method="POST">
+      <div class="form-group">
+          <label for="current_password">Current Password</label>
+          <input id="current_password" name="current_password" type="password" placeholder="" class="input-xlarge form-control" required="" autocomplete="off"/>
+      </div>
+      <div class="form-group">
+          <label for="new_password">New Password</label>
+          <input id="new_password" name="new_password" type="password" placeholder="" class="input-xlarge form-control" required="" autocomplete="off"/>
+      </div>
+      <button type="submit" class="btn btn-primary" style="vertical-align: bottom;">Change password</button>
+  </form>
+  <div class="control-group">
+      <label class="control-label"></label>
+      <div class="controls">
+        <button type="button" id="btnRandomPassword" class="btn btn-info btn-inverse btnRandomPassword" onclick="">New Random Password</button>
+        <input id="generated-password" class="input-xsmall generated-password"/>
+      </div>
+  </div>
+</div>
+{% end %}
+
+
+{% block js %}
+    <script language="JavaScript">
+    $(document).ready(function() {
+        $("#btnRandomPassword").click(function() {
+            var password = randomPassword(10, '#aA!');
+            $("#new_password").val(password);
+            $("#password").effect("highlight", {color:"#aaccff"}, 1000);
+            $("#generated-password").val(password);
+        });
+        $("#btnRandomPassword").click();
+    });
+  </script>
+{% end %}

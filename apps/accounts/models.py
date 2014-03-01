@@ -35,7 +35,8 @@ class User(Document):
 
     @classmethod
     def is_valid_password(cls, password):
-        if len(password) < 10 or len(password) > 512: return False
+        if not password: return False
+        if len(password) < 10 or len(password) > 1024: return False
         if re.match('.*\s+', password): return False
         if not re.match('.*[a-z]+', password): return False
         if not re.match('.*[A-Z]+', password): return False
@@ -43,33 +44,35 @@ class User(Document):
         if not re.match('.*[!@#$%&*()_+-={}|/?;:,.<>\\\[\]]+', password): return False
         return True
 
-    def save(self, encrypt_pass=False, **kwargs):
-        if encrypt_pass:
-            self.validate_password()
-            self.password = User.encrypt_password(self.password)
+    def pre_save(self, encrypt_pass=False):
         created = self.id is None
+        if encrypt_pass:
+            self.validate_password() # validate only for non-social logins
+            self.password = User.encrypt_password(self.password)
         if not self.secret_key:
             self.secret_key = User.generate_secret_key()
+
+    def save(self, encrypt_pass=False, **kwargs):
+        self.pre_save(encrypt_pass=encrypt_pass)
         super(User, self).save(**kwargs)
 
-    def validate_password(self):
-        errors = {}
-        try:
-            super(User, self).validate()
-        except ValidationError as e:
-            errors = e.errors
+    def get_or_create(encrypt_pass=False, write_concern=None, auto_save=True, *q_objs, **query):
+        self.pre_save(encrypt_pass=encrypt_pass)
+        return super(User, self).get_or_create(write_concern=write_concern, auto_save=auto_save, *q_objs, **query)
 
+    def validate_password(self): # it must be called before encrypting the password
         if not User.is_valid_password(self.password):
+            errors = {}
+            print(self.password)
             msg = "Invalid password. It must have at least 10 chars, 1 lower case, 1 upper case, 1 number, 1 symbol."
             errors['password'] = ValidationError(msg, field_name='password')
-        if errors:
             raise ValidationError('ValidationError', errors=errors)
 
     def change_password(self, current_password, new_password):
         errors = {}
         if User.encrypt_password(current_password) != self.password:
             errors['password'] = ValidationError('The current password is wrong', field_name='password')
-        if current_password != self.password:
+        if current_password == new_password:
             errors['password'] = ValidationError('New password must not be the same as the old one', field_name='password')
         if errors:
             raise ValidationError('ValidationError', errors=errors)
