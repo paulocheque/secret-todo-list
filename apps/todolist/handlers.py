@@ -10,7 +10,7 @@ class HomeHandler(BaseHandler):
         if self.get_current_user():
             self.render('todolist/todolists.html')
         else:
-            self.render('main.html')
+            self.render('todolist/main.html', alert='You have to login first')
 
 
 class TodoListsHandler(BaseHandler):
@@ -18,7 +18,7 @@ class TodoListsHandler(BaseHandler):
         if self.get_current_user():
             self.render('todolist/todolists.html')
         else:
-            self.render('main.html')
+            self.render('todolist/main.html', alert='You have to login first')
 
 
 class TasksHandler(BaseHandler):
@@ -26,7 +26,7 @@ class TasksHandler(BaseHandler):
         if self.get_current_user():
             self.render('todolist/tasks.html', todolist_id=todolist_id)
         else:
-            self.render('main.html')
+            self.render('todolist/main.html', alert='You have to login first')
 
 
 class TodoListCrudHandler(RestHandler):
