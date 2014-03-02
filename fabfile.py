@@ -29,10 +29,7 @@ def report():
     print(colorize('Report'))
     print(colorize('=' * 80))
     print(colorize('Settings', color='cyan'))
-    ss = SystemSettings.get()
-    for k, v in vars(ss)['_data'].items():
-        if k != 'singleton' and k != 'id':
-            print('%s: %s' % (k, v))
+    SystemSettings.show()
     print('-' * 50)
     print('%s users' % User.objects.count())
     print('-' * 50)
