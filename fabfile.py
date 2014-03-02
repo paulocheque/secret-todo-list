@@ -8,7 +8,8 @@ logging.getLogger().setLevel(logging.INFO)
 from fabric.api import task
 
 import connect_mongo
-from apps.accounts.models import User
+from apps.system_settings.models import *
+from apps.accounts.models import *
 from apps.todolist.models import *
 # from apps.todolist.tasks import *
 
@@ -27,6 +28,12 @@ def report():
     print(colorize('=' * 80))
     print(colorize('Report'))
     print(colorize('=' * 80))
+    print(colorize('Settings', color='cyan'))
+    ss = SystemSettings.get()
+    for k, v in vars(ss)['_data'].items():
+        if k != 'singleton' and k != 'id':
+            print('%s: %s' % (k, v))
+    print('-' * 50)
     print('%s users' % User.objects.count())
     print('-' * 50)
     print('%s todolists' % TodoList.objects.count())
