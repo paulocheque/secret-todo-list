@@ -57,16 +57,34 @@
           {% end %}
           </ul>
 
-          <ul class="nav navbar-nav pull-right">
           {% if not current_user or current_user == 'None' %}
+          <ul class="nav navbar-nav pull-right">
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Login<b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="/auth/facebook" class=""><i class="fa fa-facebook-square"></i> Facebook login</a></li>
                 <li><a href="/auth/google" class=""><i class="fa fa-google-plus-square"></i> Google login</a></li>
+                <li>
+                <div class="navbar-collapse collapse pull-right">
+                  <form class="navbar-form navbar-right" role="form" action="/login" method="POST">
+                    <div class="form-group">
+                      <input type="text" name="email" placeholder="Email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <input type="password" name="password" placeholder="Password" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-success">Sign in</button>
+                  </form>
+                </div>
+              </li>
               </ul>
             </li>
+            <li><a href="/register">Register</a></li>
+          </ul>
+
           {% else %}
+
+          <ul class="nav navbar-nav pull-right">
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -75,7 +93,6 @@
             </li>
           </ul>
           {% end %}
-          </ul>
 
           <ul class="nav navbar-nav pull-right">
             <li class="dropdown">
@@ -178,6 +195,12 @@
                         <input type="hidden" name="currency" value="BRL" />
                         <input type="image" src="https://p.simg.uol.com.br/out/pagseguro/i/botoes/doacoes/164x37-doar-preto-assina.gif" name="submit" alt="Pague com PagSeguro - é rápido, grátis e seguro!" />
                         </form>
+                    </li>
+
+                    <li class="list-group-item">
+                        <script data-gittip-username="paulocheque"
+                                data-gittip-widget="button"
+                                src="//gttp.co/v1.js"></script>
                     </li>
                 </div>
               </div>
