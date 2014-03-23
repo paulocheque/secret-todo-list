@@ -98,7 +98,7 @@ namespace :heroku do
     TIME_FORMAT: "%H:%M",
     DATETIME_FORMAT: "\"%Y-%m-%d %H:%M\"",
 
-    SYSTEM_NAME: "Secret TODO List",
+    SYSTEM_NAME: "Secret-TODO-List",
     DOMAIN: "#{DOMAIN}",
     PROTOCOL: "#{PROTOCOL}",
     SYSTEM_URL: "#{PROTOCOL}://#{DOMAIN}",
