@@ -87,22 +87,66 @@ end
 namespace :heroku do
   SERVER = "secret-todo-list"
   WORKER = nil
-  DOMAIN = "secret-todo-list.herokuapp.com"
   DEFAULT = SERVER
   DEFAULT = WORKER if not DEFAULT
-  BSALT = "yoursalt"
-  GOOGLE_API_KEY = ""
-  GOOGLE_CONSUMER_KEY = ""
-  GOOGLE_CONSUMER_SECRET = ""
-  FACEBOOK_API_KEY = ""
-  FACEBOOK_SECRET = ""
-  FACEBOOK_API_SECRET = ""
-  TWITTER_API_KEY = ""
-  TWITTER_API_SECRET = ""
-  TWITTER_CONSUMER_KEY = ""
-  TWITTER_CONSUMER_SECRET = ""
-  TWITTER_ACCESS_TOKEN = ""
-  TWITTER_ACCESS_TOKEN_SECRET = ""
+  DOMAIN = "secret-todo-list.herokuapp.com"
+  PROTOCOL = "http"
+  ENV_VARS = {
+    # TEST_MODE: "", # disabled
+    # ASYNC_TASKS: "true", # active by default
+    DATE_FORMAT: "%Y-%m-%d",
+    TIME_FORMAT: "%H:%M",
+    DATETIME_FORMAT: "\"%Y-%m-%d %H:%M\"",
+
+    SYSTEM_NAME: "Secret TODO List",
+    DOMAIN: "#{DOMAIN}",
+    PROTOCOL: "#{PROTOCOL}",
+    SYSTEM_URL: "#{PROTOCOL}://#{DOMAIN}",
+    SYSTEM_EMAIL: "no-reply@#{DOMAIN}",
+    ADMIN_EMAIL: "paulocheque@gmail.com",
+    BSALT: "#{DOMAIN}-yoursalt",
+
+    GOOGLE_ANALYTICS: "UA-48589622-1", # UA-CHANGEHERE-1
+    GOOGLE_PLUS_ACCOUNT: "",
+    GOOGLE_API_KEY: "",
+    GOOGLE_CONSUMER_KEY: "",
+    GOOGLE_CONSUMER_SECRET: "",
+
+    FACEBOOK_ACCOUNT: "",
+    FACEBOOK_REDIRECT_URL: "#{PROTOCOL}://#{DOMAIN}/auth/facebook",
+    FACEBOOK_API_KEY: "199850516854035",
+    FACEBOOK_SECRET: "79d824634c04376d77cdc0789ad500e1",
+    FACEBOOK_API_SECRET: "79d824634c04376d77cdc0789ad500e1", # FACEBOOK_SECRET
+
+    TWITTER_ACCOUNT: "",
+    TWITTER_API_KEY: "",
+    TWITTER_API_SECRET: "",
+    TWITTER_CONSUMER_KEY: "", # TWITTER_API_KEY
+    TWITTER_CONSUMER_SECRET: "", # TWITTER_API_SECRET
+    TWITTER_ACCESS_TOKEN: "",
+    TWITTER_ACCESS_TOKEN_SECRET: "",
+
+    GITHUB_ACCOUNT: "",
+    GITHUB_REDIRECT_URL: "#{PROTOCOL}://#{DOMAIN}/auth/github",
+    GITHUB_CLIENT_ID: "",
+    GITHUB_SECRET: "",
+    GITHUB_SCOPE: "",
+
+    SKYPE_ACCOUNT: "",
+
+    PAGSEGURO_MODE: "live",
+    PAGSEGURO_EMAIL: "",
+    PAGSEGURO_TOKEN: "",
+    MERCADOPAGO_MODE: "live",
+    MERCADOPAGO_CLIENT_ID: "",
+    MERCADOPAGO_CLIENT_SECRET: "",
+    PAYPAL_MODE: "live",
+    PAYPAL_CLIENT_ID: "",
+    PAYPAL_CLIENT_SECRET: "",
+    MOIP_MODE: "producao",
+    MOIP_TOKEN: "",
+    MOIP_KEY: "",
+  }
 
   task :create => [] do
     # sh "heroku apps:create #{SERVER}" if SERVER
@@ -120,7 +164,7 @@ namespace :heroku do
     sh "heroku addons:add sendgrid --app #{WORKER}" if WORKER
     # sh "heroku addons:add postmark --app #{WORKER}" if WORKER
     # sh "heroku addons:add mongolab --app #{SERVER}" if SERVER
-    # sh "heroku domains:add #{DOMAIN} --app #{SERVER}" if SERVER and DOMAIN
+    sh "heroku domains:add #{DOMAIN} --app #{SERVER}" if SERVER and not ENV_VARS[:DOMAIN].end_with?("herokuapp.com")
   end
 
   task :config => [] do
@@ -144,28 +188,20 @@ namespace :heroku do
   end
 
   task :setvars do
-    REDISTOGO_URL = `heroku config:get REDISTOGO_URL --app #{SERVER}` if SERVER
-    REDISTOGO_URL.strip! if SERVER
-    sh "heroku config:set REDIS_URL=#{REDISTOGO_URL} REDISTOGO_URL=#{REDISTOGO_URL} --app #{WORKER}" if WORKER
-
-    # MONGOHQ_URL = `heroku config:get MONGOHQ_URL --app #{SERVER}` if SERVER
-    # MONGOHQ_URL.strip! if SERVER
-    # sh "heroku config:set MONGOHQ_URL=#{MONGOHQ_URL} --app #{WORKER}" if WORKER
+    redistogo_url = `heroku config:get REDISTOGO_URL --app #{SERVER}` if SERVER
+    redistogo_url.strip! if SERVER
+    mongohq_url = `heroku config:get MONGOHQ_URL --app #{SERVER}` if SERVER
+    mongohq_url.strip! if SERVER
 
     [SERVER, WORKER].each { |app|
       if app
-        sh "heroku config:set BSALT=#{BSALT} --app #{app}"
-        sh "heroku config:set GOOGLE_CONSUMER_KEY=#{GOOGLE_CONSUMER_KEY} --app #{app}"
-        sh "heroku config:set GOOGLE_CONSUMER_SECRET=#{GOOGLE_CONSUMER_SECRET} --app #{app}"
-        sh "heroku config:set FACEBOOK_API_KEY=#{FACEBOOK_API_KEY} --app #{app}"
-        sh "heroku config:set FACEBOOK_SECRET=#{FACEBOOK_SECRET} --app #{app}"
-        sh "heroku config:set FACEBOOK_API_SECRET=#{FACEBOOK_API_SECRET} --app #{app}"
-        sh "heroku config:set TWITTER_API_KEY=#{TWITTER_API_KEY} --app #{app}"
-        sh "heroku config:set TWITTER_API_SECRET=#{TWITTER_API_SECRET} --app #{app}"
-        sh "heroku config:set TWITTER_CONSUMER_KEY=#{TWITTER_CONSUMER_KEY} --app #{app}"
-        sh "heroku config:set TWITTER_CONSUMER_SECRET=#{TWITTER_CONSUMER_SECRET} --app #{app}"
-        sh "heroku config:set TWITTER_ACCESS_TOKEN=#{TWITTER_ACCESS_TOKEN} --app #{app}"
-        sh "heroku config:set TWITTER_ACCESS_TOKEN_SECRET=#{TWITTER_ACCESS_TOKEN_SECRET} --app #{app}"
+        vars = ENV_VARS.map{ |k,v| "#{k}=#{v}" }.join(' ')
+        puts vars
+        if app == WORKER
+          complement = " REDIS_URL=#{redistogo_url} REDISTOGO_URL=#{redistogo_url} MONGOHQ_URL=#{mongohq_url}"
+          vars = vars + complement
+        end
+        sh "heroku config:set #{vars} --app #{app}"
       end
     }
   end

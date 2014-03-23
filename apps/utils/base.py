@@ -1,4 +1,5 @@
 # coding: utf-8
+import os
 import urllib
 
 import tornado.web
@@ -53,7 +54,45 @@ class BaseHandler(tornado.web.RequestHandler):
             kwargs['alert_type'] = self.get_argument('alert_type', 'alert-info')
         if 'current_user' not in kwargs:
             kwargs['current_user'] = self.get_current_user()
+
+        kwargs['SYSTEM_NAME'] = os.getenv('SYSTEM_NAME')
+        kwargs['SYSTEM_EMAIL'] = os.getenv('SYSTEM_EMAIL')
+        kwargs['SYSTEM_URL'] = os.getenv('SYSTEM_URL')
+        kwargs['DOMAIN'] = os.getenv('DOMAIN')
+        kwargs['DATE_FORMAT'] = os.getenv('DATE_FORMAT')
+        kwargs['TIME_FORMAT'] = os.getenv('TIME_FORMAT')
+        kwargs['DATETIME_FORMAT'] = os.getenv('DATETIME_FORMAT')
+
+        kwargs['GOOGLE_ANALYTICS'] = os.getenv('GOOGLE_ANALYTICS')
+        kwargs['GITHUB_ACCOUNT'] = os.getenv('GITHUB_ACCOUNT')
+        kwargs['TWITTER_ACCOUNT'] = os.getenv('TWITTER_ACCOUNT')
+        kwargs['FACEBOOK_ACCOUNT'] = os.getenv('FACEBOOK_ACCOUNT')
+        kwargs['FACEBOOK_API_KEY'] = os.getenv('FACEBOOK_API_KEY')
+        kwargs['GOOGLE_PLUS_ACCOUNT'] = os.getenv('GOOGLE_PLUS_ACCOUNT')
+        kwargs['SKYPE_ACCOUNT'] = os.getenv('SKYPE_ACCOUNT')
         return super(BaseHandler, self).render(template_name, **kwargs)
+
+
+class AuthenticatedBaseHandler(BaseHandler):
+    LOGIN_MSG = 'You have to login first. It is simple and fast.'
+    ADMIN_PERMISSION = False
+
+    def prepare(self):
+        super(AuthenticatedBaseHandler, self).prepare()
+        user = self.get_current_user()
+        if not user:
+            alert = self.LOGIN_MSG
+            url = self.settings.get('login_url', '/')
+            self.redirect(url, alert=alert, alert_type='alert-warning')
+        elif self.ADMIN_PERMISSION and not user.admin:
+            self.raise403()
+        elif (not user.admin) and (not self.user_has_permission()):
+            self.raise403()
+
+    def user_has_permission(self):
+        # Tornado hack to get identifier begore GET/POST
+        # identifier = self.request.path replace/split/etc
+        return True
 
 
 class CachedBaseHandler(BaseHandler):

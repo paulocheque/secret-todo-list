@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     {% include "metadata.html" %}
-
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
@@ -36,20 +35,8 @@
       {% end %}
 
       <div class="row">
-        <div class="col-xs-8 col-md-8 col-lg-8">
-          {% include "ads/boobox_horizontal_banner.html" %}
-          {% include "ads/uol_horizontal_banner.html" %}
-          {% include "ads/amazon_horizontal_banner.html" %}
-
+        <div class="col-xs-12 col-md-12 col-lg-12">
           {% block content %}{% end %}
-        </div>
-
-        <div class="col-xs-4 col-md-4 col-lg-4">
-            {% include "social/social_buttons.html" %}
-
-            {% include "ads/boobox_square.html" %}
-
-            {% include "ads/boobox_vertical_banner.html" %}
         </div>
       </div>
 
@@ -62,6 +49,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/jquery.pnotify.min.js"></script>
+    <script src="http://weblibraries.s3.amazonaws.com/jquery.maskedinput.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/jquery.tablesorter.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/moment.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/ba-linkify.min.js"></script>
@@ -70,27 +58,6 @@
     <script src="http://weblibraries.s3.amazonaws.com/secret-rest-client.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/secret-data-table.min.js"></script>
     <script src="/static/js/custom.js"></script>
-
-    <script language="JavaScript">
-    $(document).ready(function() {
-      function createMenuItem(data) {
-          var linkName = createLink("/todolist/" + data._id + "/tasks", data.name);
-          var li = $("<li/>").append(linkName);
-          $("#my-todo-lists").append(li);
-      }
-
-      {% if current_user %}
-      var client = new SecretRestClient("{{ current_user.secret_key }}", "{{ current_user.id }}", "/api/todolists", "1");
-      client.list(0, 50, function(lines, status) {
-          for (var i in lines) {
-              var data = lines[i];
-              createMenuItem(data);
-          }
-      }, null);
-      {% end %}
-    });
-    </script>
-
     {% block js %}{% end %}
 
     {% include "social/script_google_analytics.html" %}
