@@ -7,6 +7,7 @@
     </button>
 
     <a class="navbar-brand" href="/">{{ SYSTEM_NAME }}</a>
+    <!-- <a class="navbar-brand navbar-brand-img" href="/"><img src="" alt="{{ SYSTEM_NAME }}" class="img-rounded"/></a> -->
 
     <div class="navbar-collapse collapse navbar-responsive-collapse">
       {% include "social/social_header.html" %}
@@ -39,10 +40,23 @@
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a href="/logout" class="pull-right">Log out {{ current_user.email }}</a></li>
+            <li><a href="/logout">Log out {{ current_user.email }}</a></li>
           </ul>
         </li>
       </ul>
+
+      {% if current_user.admin %}
+      <ul class="nav navbar-nav pull-right">
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Admin <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="/admin/">Link1</a></li>
+            <li><a href="/admin/">Link2</a></li>
+          </ul>
+        </li>
+      </ul>
+      {% end %}
+
       {% end %}
 
 

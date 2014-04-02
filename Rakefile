@@ -89,7 +89,7 @@ namespace :heroku do
   WORKER = nil
   DEFAULT = SERVER
   DEFAULT = WORKER if not DEFAULT
-  DOMAIN = "secret-todo-list.herokuapp.com"
+  DOMAIN = "#{SERVER}.herokuapp.com"
   PROTOCOL = "http"
   ENV_VARS = {
     # TEST_MODE: "", # disabled
@@ -149,8 +149,13 @@ namespace :heroku do
   }
 
   task :create => [] do
-    # sh "heroku apps:create #{SERVER}" if SERVER
-    # sh "heroku apps:create #{WORKER}" if WORKER
+    # sh "git remote add bootstrap git@github.com:paulocheque/python-tornado-bootstrap.git"
+    # sh "git pull bootstrap master"
+    sh "heroku apps:create #{SERVER}" if SERVER
+    sh "heroku apps:create #{WORKER}" if WORKER
+    sh "git remote add heroku git@heroku.com:#{SERVER}.git" if SERVER
+    sh "git remote add heroku2 git@heroku.com:#{WORKER}.git" if WORKER
+
     sh "heroku addons:add newrelic --app #{SERVER}" if SERVER
     sh "heroku addons:add newrelic --app #{WORKER}" if WORKER
     # sh "newrelic-admin generate-config YOUR_ID newrelic.ini"
@@ -253,6 +258,7 @@ task :logos do
     sh "convert #{LOGO_BANNER} -resize 400x150\! logo-400x150.png" # FB cover image
     sh "convert #{LOGO_BANNER} -resize 155x100\! logo-155x100.png" # FB app web banner
     sh "convert #{LOGO_BANNER} -resize 200x60\! logo-200x60.png" # Site logo
+    sh "convert #{LOGO_BANNER} -resize 150x50\! logo-150x55.png" # PagSeguro logo
     sh "convert #{LOGO_BANNER} -resize 150x50\! logo-150x50.png" # Site logo
     sh "convert #{LOGO_BANNER} -resize 140x40\! logo-140x40.png" # Site logo
   end

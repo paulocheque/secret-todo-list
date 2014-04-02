@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
     <link rel="stylesheet" href="http://weblibraries.s3.amazonaws.com/jquery.pnotify.default.css">
     <link rel="stylesheet" href="http://weblibraries.s3.amazonaws.com/jquery.pnotify.default.icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -20,7 +21,6 @@
     </style>
 
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-    <link rel="shortcut icon" href="/static/favicon.jpg">
   </head>
 
   <body>
@@ -51,6 +51,7 @@
     <script src="http://weblibraries.s3.amazonaws.com/jquery.pnotify.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/jquery.maskedinput.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/jquery.tablesorter.min.js"></script>
+    <script src="http://weblibraries.s3.amazonaws.com/jquery.form.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/moment.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/ba-linkify.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/hmac-sha256.min.js"></script>
@@ -58,6 +59,18 @@
     <script src="http://weblibraries.s3.amazonaws.com/secret-rest-client.min.js"></script>
     <script src="http://weblibraries.s3.amazonaws.com/secret-data-table.min.js"></script>
     <script src="/static/js/custom.js"></script>
+    <script language="JavaScript">
+    $(document).ready(function() {
+        {% if not current_user or current_user == 'None' %}
+        var links = $("a.current-url").each(function() {
+            if ($(this).attr("href").endsWith("?next=")) {
+                $(this).attr("href", $(this).attr("href") + currentUrl());
+            }
+        });
+        {% else %}
+        {% end %}
+    });
+    </script>
     {% block js %}{% end %}
 
     {% include "social/script_google_analytics.html" %}

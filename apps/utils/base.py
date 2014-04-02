@@ -3,6 +3,7 @@ import os
 import urllib
 
 import tornado.web
+from mongoengine import DoesNotExist
 
 from apps.accounts.models import User
 import connect_redis
@@ -19,14 +20,23 @@ class BaseHandler(tornado.web.RequestHandler):
         else:
             self.raise403()
 
-    def raise401(self):
-        raise tornado.web.HTTPError(401, 'Not enough permissions to perform this action')
+    def raise400(self, msg=None):
+        raise tornado.web.HTTPError(400, msg or 'Invalid request')
 
-    def raise403(self):
-        raise tornado.web.HTTPError(403, 'Not enough permissions to perform this action')
+    def raise401(self, msg=None):
+        raise tornado.web.HTTPError(401, msg or 'Not enough permissions to perform this action')
 
-    def raise404(self):
-        raise tornado.web.HTTPError(404, 'Object not found')
+    def raise403(self, msg=None):
+        raise tornado.web.HTTPError(403, msg or 'Not enough permissions to perform this action')
+
+    def raise404(self, msg=None):
+        raise tornado.web.HTTPError(404, msg or 'Object not found')
+
+    def raise422(self, msg=None):
+        raise tornado.web.HTTPError(422, msg or 'Invalid request')
+
+    def raise500(self, msg=None):
+        raise tornado.web.HTTPError(500, msg or 'Something is not right')
 
     def get_current_user(self):
         email = self.get_secure_cookie('user')
@@ -72,6 +82,27 @@ class BaseHandler(tornado.web.RequestHandler):
         kwargs['SKYPE_ACCOUNT'] = os.getenv('SKYPE_ACCOUNT')
         return super(BaseHandler, self).render(template_name, **kwargs)
 
+    def get_indentifiers(self):
+        # Tornado hack to get identifier begore GET/POST (in prepare method, for example)
+        return self.request.path.split('/')
+
+
+class ImageHandler(BaseHandler):
+    def get_image(self, identifier, index=0):
+        return None
+
+    def get(self, identifier, index=0):
+        try:
+            index = int(index)
+            img = self.get_image(identifier, index)
+            if img:
+                if img.content_type:
+                    self.set_header('Content-type', img.content_type)
+                self.write(img.read())
+            self.finish()
+        except (DoesNotExist, IndexError):
+            self.raise404()
+
 
 class AuthenticatedBaseHandler(BaseHandler):
     LOGIN_MSG = 'You have to login first. It is simple and fast.'
@@ -116,3 +147,42 @@ class CachedBaseHandler(BaseHandler):
         redis_connection.expire(self.request.uri, self.expire_timeout)
         # print('Page %s cached' % self.request.uri)
         return html_generated
+
+
+class ObjectReadListHandler(BaseHandler):
+    model = None
+    # model_ref = model.__names__.lower()
+    template = '' # '{model}s/{model}.html'.format(model=model_ref)
+    template_list = '' # '{model}s/{model}s.html'.format(model=model_ref)
+    var = 'obj' # '{model}.format(model=model_ref)
+    var_list = 'objs' # '{model}s.format(model=model_ref)
+    filter_by_user = False
+    use_slug_instead_of_id = False
+
+    def get_objects(self, id_or_slug):
+        if self.use_slug_instead_of_id:
+            return self.model.objects.filter(slug=id_or_slug)
+        else:
+            return self.model.objects.filter(id=id_or_slug)
+
+    def get(self, identifier=None):
+        user = self.get_current_user()
+        # READ
+        if identifier:
+            try:
+                objs = self.get_objects(identifier)
+                if self.filter_by_user and (not user.admin):
+                    obj = objs.filter(user=user).get()
+                else:
+                    obj = objs.get()
+                template_vars = {self.var: obj}
+                self.render(self.template, **template_vars)
+            except self.model.DoesNotExist:
+                self.raise404()
+        # LIST
+        else:
+            objs = self.model.objects
+            if self.filter_by_user:
+                objs = objs.filter(user=user)
+            template_vars = {self.var_list: obj}
+            self.render(self.template_list, **template_vars)

@@ -68,6 +68,7 @@ class TaggifyTests(unittest.TestCase):
         self.assertEquals(['a', 'b'], taggify(' a , b , a,b'))
         self.assertEquals(['a', 'b'], taggify(' a , B , A,b'))
         self.assertEquals(['a', 'b'], taggify(' a \n B \n A\r\nb', comma='\n'))
+        self.assertEquals(['aaaa'], taggify('áàãâ'))
 
     def test_accepts_lists(self):
         self.assertEquals(None, taggify(None))
@@ -112,5 +113,10 @@ class SlugifyTests(unittest.TestCase):
         self.assertEquals('xi-ffa-da-rateria', slugify('XI FFA DA RATERIA'))
         self.assertEquals('example-x-with-hyphen', slugify('EXAMPLE X - - With Hyphen'))
 
-    def test_date_slugify(self):
+    def test_slugify_with_date(self):
         self.assertEquals(datetime.today().strftime('%Y-%m-%d') + '-camel-case', slugify_with_date('CamelCase'))
+
+    def test_slugify_with_datetime(self):
+        self.assertEquals(True, slugify_with_datetime('CamelCase').startswith(datetime.now().strftime('%Y-%m-%dT%H')))
+        self.assertEquals(True, slugify_with_datetime('CamelCase').endswith('-camel-case'))
+

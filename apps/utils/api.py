@@ -1,11 +1,13 @@
 # coding: utf-8
-import datetime
-import hmac
-import hashlib
 import base64
+import collections
+import datetime
+import hashlib
+import hmac
+import re
 
 import tornado.web
-from mongoengine import Document
+from mongoengine.base import BaseDocument
 
 from .base import BaseHandler
 from .serializer import data_to_json
@@ -13,9 +15,29 @@ from apps.accounts.models import User # FIXME need refactoring
 
 
 class ApiHandler(BaseHandler):
+    def prepare_data_obj(self, data):
+        if hasattr(data, 'to_api_dict'):
+            identifier = None
+            if hasattr(data, 'id'):
+                identifier = str(data.id)
+            data = data.to_api_dict()
+            if identifier and 'id' not in data:
+                data['id'] = identifier
+                data['_id'] = identifier
+            return data
+        return data
+
+    def prepare_data(self, data):
+        is_iterable = isinstance(data, collections.Iterable) and hasattr(data, '__iter__') and not hasattr(data, 'to_mongo')
+        if isinstance(data, BaseDocument):
+            return self.prepare_data_obj(data)
+        elif is_iterable:
+            return [self.prepare_data_obj(d) for d in data]
+        return data
+
     def answer(self, data):
         self.set_header("Content-Type", "application/json")
-        data_json = data_to_json(data)
+        data_json = data_to_json(self.prepare_data(data))
         self.write(data_json)
 
     def prepare(self):
@@ -48,7 +70,11 @@ class ApiHandler(BaseHandler):
     def get_signature(self, secret_key, data):
         data_prepared = []
         for key in sorted(data.keys()):
-            token = key.lower() + "=" + (data[key] if data[key] is not None else '')
+            value = data[key] if data[key] is not None else ''
+            # https://api.jquery.com/serializeArray/
+            # https://github.com/jquery/jquery/blob/master/src/serialize.js
+            value = re.sub('\\s', '', value)
+            token = key.lower() + "=" + value
             # print(token)
             data_prepared.append(token)
         data_prepared = '&'.join(data_prepared)
@@ -83,4 +109,7 @@ class ApiHandler(BaseHandler):
                 data[arg] = False
             elif data[arg] and data[arg].lower() in ['true']:
                 data[arg] = True
+        data['ip'] = self.request.remote_ip
+        data['files'] = self.request.files
+        data['user'] = self.get_current_user()
         return data
