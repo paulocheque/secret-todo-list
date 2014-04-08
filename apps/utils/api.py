@@ -14,7 +14,7 @@ from .serializer import data_to_json
 from apps.accounts.models import User # FIXME need refactoring
 
 
-class ApiHandler(BaseHandler):
+class ApiBaseHandler(BaseHandler):
     def prepare_data_obj(self, data):
         if hasattr(data, 'to_api_dict'):
             identifier = None
@@ -31,6 +31,11 @@ class ApiHandler(BaseHandler):
         is_iterable = isinstance(data, collections.Iterable) and hasattr(data, '__iter__') and not hasattr(data, 'to_mongo')
         if isinstance(data, BaseDocument):
             return self.prepare_data_obj(data)
+        elif isinstance(data, dict):
+            data_obj = {}
+            for k, v in data.items():
+                data_obj[k] = self.prepare_data(v)
+            return data_obj
         elif is_iterable:
             return [self.prepare_data_obj(d) for d in data]
         return data
@@ -40,6 +45,46 @@ class ApiHandler(BaseHandler):
         data_json = data_to_json(self.prepare_data(data))
         self.write(data_json)
 
+    def answer_with_pagination(self, array):
+        total_count = len(array)
+        # limit E [10,1000]
+        limit = int(self.get_argument('limit', 10))
+        limit = min(1000, limit) if limit > 0 else max(10, limit)
+        # initial E [0:count-1]
+        initial = int(self.get_argument('initial', 0))
+        initial = min(total_count-1, initial) if limit > 0 else max(0, limit)
+        last_index = initial + limit
+        results = array[initial:last_index]
+        count = len(results)
+        is_first_page = initial == 0
+        is_last_page = last_index >= total_count
+        next = 'initial=%s&limit=%s' % (last_index, limit) if not is_last_page else None
+        previous = 'initial=%s&limit=%s' % (max(0, initial - limit), limit) if not is_first_page else None
+        response = dict(total_count=total_count, count=count, results=results, next=next, previous=previous)
+        # print(is_first_page, is_last_page)
+        # print(initial, limit)
+        # print(response)
+        self.answer(response)
+
+    def get_request_data(self):
+        data = {}
+        for arg in list(self.request.arguments.keys()):
+            if arg in ['auth_version', 'auth_public_key', 'auth_timestamp', 'auth_signature']:
+                continue
+            data[arg] = self.get_argument(arg)
+            if data[arg] == '': # Tornado 3.0+ compatibility
+                data[arg] = None
+            elif data[arg] and data[arg].lower() in ['false']:
+                data[arg] = False
+            elif data[arg] and data[arg].lower() in ['true']:
+                data[arg] = True
+        data['ip'] = self.request.remote_ip
+        data['files'] = self.request.files
+        data['user'] = self.get_current_user()
+        return data
+
+
+class ApiHandler(ApiBaseHandler):
     def prepare(self):
         super(ApiHandler, self).prepare()
         self.authenticate()
@@ -95,21 +140,4 @@ class ApiHandler(BaseHandler):
             if arg in ['auth_version', 'auth_public_key', 'auth_timestamp', 'auth_signature']:
                 continue
             data[arg] = self.get_argument(arg)
-        return data
-
-    def get_request_data(self):
-        data = {}
-        for arg in list(self.request.arguments.keys()):
-            if arg in ['auth_version', 'auth_public_key', 'auth_timestamp', 'auth_signature']:
-                continue
-            data[arg] = self.get_argument(arg)
-            if data[arg] == '': # Tornado 3.0+ compatibility
-                data[arg] = None
-            elif data[arg] and data[arg].lower() in ['false']:
-                data[arg] = False
-            elif data[arg] and data[arg].lower() in ['true']:
-                data[arg] = True
-        data['ip'] = self.request.remote_ip
-        data['files'] = self.request.files
-        data['user'] = self.get_current_user()
         return data
